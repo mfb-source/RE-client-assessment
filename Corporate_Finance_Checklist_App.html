@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corporate Finance Status Checklist</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+<style>
+  :root {
+    --blue-dk: #0D4F7C; --blue: #1A6FA8; --blue-md: #2581C4;
+    --blue-lt: #D0E8F5; --blue-xlt: #E8F3FA; --blue-xlt2: #F0F8FD;
+    --gray-900: #111827; --gray-700: #374151; --gray-600: #4B5563;
+    --gray-500: #6B7280; --gray-400: #9CA3AF; --gray-300: #D1D5DB;
+    --gray-200: #E5E7EB; --gray-100: #F3F4F6; --gray-50: #F9FAFB;
+    --white: #FFFFFF;
+    --s0-bg:#E5E7EB; --s0-fg:#6B7280;
+    --s1-bg:#FEF3C7; --s1-fg:#92400E;
+    --s2-bg:#DBEAFE; --s2-fg:#1E40AF;
+    --s3-bg:#F5F3FF; --s3-fg:#5B21B6;
+    --s4-bg:#D1FAE5; --s4-fg:#065F46;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Calibri', 'Segoe UI', Arial, sans-serif; background: #EFF3F7; color: var(--gray-700); font-size: 13px; min-height: 100vh; }
+
+  /* Header */
+  .app-header { background: linear-gradient(135deg, var(--blue-dk) 0%, var(--blue) 100%); color: white; padding: 18px 28px 14px; display: flex; align-items: flex-end; justify-content: space-between; }
+  .app-header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.1; }
+  .app-header .sub { font-size: 11px; opacity: 0.75; margin-top: 3px; font-style: italic; }
+  .app-header .brand { font-size: 11px; opacity: 0.55; font-weight: 600; letter-spacing: 0.5px; }
+
+  /* Nav tabs */
+  .nav-bar { background: var(--blue-dk); padding: 0 28px; display: flex; align-items: center; gap: 4px; border-top: 1px solid rgba(255,255,255,0.12); }
+  .nav-tab { padding: 10px 18px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.55); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.18s; user-select: none; white-space: nowrap; }
+  .nav-tab:hover { color: rgba(255,255,255,0.85); }
+  .nav-tab.active { color: white; border-bottom-color: #60C4FF; }
+  .nav-home-btn { display: inline-flex; align-items: center; gap: 5px; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 600; cursor: pointer; padding: 10px 12px 10px 0; border: none; background: none; font-family: inherit; border-right: 1px solid rgba(255,255,255,0.15); margin-right: 8px; transition: color 0.15s; white-space: nowrap; }
+  .nav-home-btn:hover { color: rgba(255,255,255,0.9); }
+
+  /* Pages */
+  .page { display: none; padding: 22px 28px 40px; max-width: 1300px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* Cards */
+  .card { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 18px; overflow: hidden; }
+  .card-header { background: var(--blue-dk); color: white; padding: 10px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+  .card-header .cat-weight { background: rgba(255,255,255,0.18); border-radius: 10px; padding: 2px 8px; font-size: 10px; font-weight: 600; }
+  .card-body { padding: 16px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+  .form-grid.triple { grid-template-columns: 1fr 1fr 1fr; }
+  .form-grid.single { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 4px; }
+  .form-group.span2 { grid-column: span 2; }
+  .form-group.span3 { grid-column: span 3; }
+  label { font-size: 11px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.4px; }
+  input[type=text], input[type=date], input[type=number], textarea, select {
+    border: 1px solid var(--gray-300); border-radius: 5px; padding: 7px 10px;
+    font-size: 12px; color: var(--gray-900); width: 100%; font-family: inherit;
+    background: var(--gray-50); transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,111,168,0.12); background: white; }
+  textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+
+  /* Instruments checkboxes */
+  .instruments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 7px; margin-top: 4px; }
+  .instrument-item { display: flex; align-items: center; gap: 7px; padding: 6px 10px; border: 1px solid var(--gray-200); border-radius: 5px; cursor: pointer; transition: all 0.13s; background: var(--gray-50); }
+  .instrument-item:hover { background: var(--blue-xlt); border-color: var(--blue-lt); }
+  .instrument-item input[type=checkbox] { width: 14px; height: 14px; cursor: pointer; accent-color: var(--blue); }
+  .instrument-item span { font-size: 11px; font-weight: 500; color: var(--gray-700); cursor: pointer; }
+  .instrument-item.checked { background: var(--blue-xlt2); border-color: var(--blue-lt); }
+  .instrument-item.checked span { color: var(--blue-dk); font-weight: 600; }
+
+  /* Checklist */
+  .cat-block { margin-bottom: 14px; border: 1px solid var(--gray-200); border-radius: 8px; overflow: hidden; }
+  .cat-header { display: grid; grid-template-columns: 1fr auto auto; align-items: center; padding: 11px 14px; background: linear-gradient(135deg, var(--blue-dk), #1A6FA8); color: white; cursor: pointer; user-select: none; }
+  .cat-header .cat-title { font-size: 13px; font-weight: 700; }
+  .cat-header .cat-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; opacity: 0.85; }
+  .cat-header .cat-score-pill { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 3px 10px; font-weight: 700; font-size: 11px; }
+  .cat-header .toggle-icon { margin-left: 10px; font-size: 14px; transition: transform 0.2s; }
+  .cat-header.collapsed .toggle-icon { transform: rotate(-90deg); }
+
+  .checklist-header { display: grid; grid-template-columns: 1.6fr 105px 68px 1fr 1fr; gap: 0; background: var(--blue-xlt); border-bottom: 1px solid var(--blue-lt); padding: 7px 14px; font-size: 10px; font-weight: 700; color: var(--blue-dk); text-transform: uppercase; letter-spacing: 0.5px; }
+  .checklist-rows { background: white; }
+  .checklist-row { display: grid; grid-template-columns: 1.6fr 105px 68px 1fr 1fr; gap: 0; padding: 10px 14px; border-bottom: 1px solid var(--gray-100); align-items: start; transition: opacity 0.15s; }
+  .checklist-row:last-child { border-bottom: none; }
+  .checklist-row:hover { background: var(--gray-50); }
+  .checklist-row.na-row { opacity: 0.4; }
+
+  .item-desc { font-size: 12px; font-weight: 500; color: var(--gray-900); line-height: 1.45; margin-bottom: 5px; }
+  .item-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .tag { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .tag-sub     { background: var(--gray-100); color: var(--gray-600); }
+  .tag-crit    { background: #FEE2E2; color: #DC2626; }
+  .tag-high    { background: #FEF3C7; color: #92400E; }
+  .tag-med     { background: #DBEAFE; color: #1E40AF; }
+  .tag-low     { background: var(--gray-100); color: var(--gray-500); }
+
+  .item-rel    { font-size: 10px; color: var(--gray-400); margin-top: 4px; font-style: italic; }
+
+  /* Status select */
+  .status-select { border: 1px solid var(--gray-300); border-radius: 5px; padding: 5px 7px; font-size: 11px; font-weight: 600; width: 100%; cursor: pointer; background: white; font-family: inherit; }
+  .status-select:focus { outline: none; border-color: var(--blue); }
+  .status-select.s0 { background: var(--s0-bg); color: var(--s0-fg); border-color: #D1D5DB; }
+  .status-select.s1 { background: var(--s1-bg); color: var(--s1-fg); border-color: #FCD34D; }
+  .status-select.s2 { background: var(--s2-bg); color: var(--s2-fg); border-color: #93C5FD; }
+  .status-select.s3 { background: var(--s3-bg); color: var(--s3-fg); border-color: #C4B5FD; }
+  .status-select.s4 { background: var(--s4-bg); color: var(--s4-fg); border-color: #6EE7B7; }
+
+  /* NA toggle */
+  .na-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding-top: 2px; }
+  .na-wrap input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; accent-color: var(--gray-500); }
+  .na-wrap label { font-size: 10px; color: var(--gray-500); font-weight: 600; cursor: pointer; }
+
+  /* Item notes */
+  .item-note { border: 1px solid var(--gray-200); border-radius: 4px; padding: 6px 8px; font-size: 11px; font-family: inherit; width: 100%; color: var(--gray-700); background: var(--gray-50); resize: vertical; min-height: 50px; line-height: 1.4; }
+  .item-note:focus { outline: none; border-color: var(--blue); background: white; }
+  .item-note:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Legend */
+  .legend-card { background: white; border-radius: 8px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px; }
+  .legend-title { font-size: 11px; font-weight: 700; color: var(--blue-dk); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 11px; }
+  .legend-pill { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+
+  /* Summary page */
+  .stat-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 18px; }
+  .stat-card { background: white; border-radius: 8px; padding: 16px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.07); border-top: 3px solid var(--blue-lt); }
+  .stat-num { font-size: 32px; font-weight: 800; color: var(--blue-dk); line-height: 1; }
+  .stat-lbl { font-size: 11px; color: var(--gray-500); margin-top: 4px; font-weight: 500; }
+
+  .score-card { background: linear-gradient(135deg, var(--blue-dk) 0%, #1A6FA8 100%); color: white; border-radius: 8px; padding: 24px 28px; box-shadow: 0 2px 8px rgba(13,79,124,0.3); margin-bottom: 18px; display: flex; align-items: center; gap: 32px; }
+  .score-num { font-size: 64px; font-weight: 800; line-height: 1; }
+  .score-pct { font-size: 28px; font-weight: 600; opacity: 0.7; }
+  .score-label { font-size: 14px; opacity: 0.8; margin-top: 4px; }
+  .score-bar-wrap { flex: 1; }
+  .score-bar-track { background: rgba(255,255,255,0.2); border-radius: 8px; height: 14px; overflow: hidden; }
+  .score-bar-fill { height: 100%; background: linear-gradient(90deg, #60C4FF, #A7F3D0); border-radius: 8px; transition: width 0.5s ease; }
+  .score-bar-label { font-size: 11px; opacity: 0.7; margin-top: 6px; }
+
+  .cat-summary-row { display: grid; grid-template-columns: 220px 1fr 110px 60px; gap: 12px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--gray-100); }
+  .cat-summary-row:last-child { border-bottom: none; }
+  .cat-prog-track { background: var(--gray-100); border-radius: 6px; height: 8px; overflow: hidden; }
+  .cat-prog-fill  { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--blue), #60C4FF); transition: width 0.4s; }
+  .cat-prog-pct   { font-size: 12px; font-weight: 700; color: var(--blue-dk); text-align: right; }
+
+
+
+  /* Export page */
+  .export-section { max-width: 640px; }
+  .export-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all 0.15s; }
+  .export-btn-primary { background: var(--blue-dk); color: white; }
+  .export-btn-primary:hover { background: var(--blue); box-shadow: 0 2px 8px rgba(13,79,124,0.35); }
+  .export-btn-secondary { background: white; color: var(--blue-dk); border: 1.5px solid var(--blue-lt); }
+  .export-btn-secondary:hover { background: var(--blue-xlt); }
+  .export-row { display: flex; align-items: flex-start; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--gray-100); }
+  .export-row:last-child { border-bottom: none; }
+  .export-icon { font-size: 28px; margin-top: 2px; flex-shrink: 0; }
+  .export-title { font-size: 13px; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; }
+  .export-desc { font-size: 11px; color: var(--gray-500); line-height: 1.5; margin-bottom: 10px; }
+
+  /* Misc */
+  .page-title { font-size: 16px; font-weight: 700; color: var(--blue-dk); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--blue-lt); }
+  .section-note { font-size: 11px; color: var(--gray-500); background: var(--blue-xlt); border-left: 3px solid var(--blue-lt); padding: 8px 12px; border-radius: 0 5px 5px 0; margin-bottom: 14px; }
+
+  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1F2937; color: white; padding: 10px 20px; border-radius: 24px; font-size: 12px; font-weight: 600; opacity: 0; pointer-events: none; transition: all 0.25s; z-index: 999; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div>
+    <div class="app-header h1" style="font-size:20px;font-weight:700;line-height:1.1;">Corporate Finance Status Checklist</div>
+    <div class="sub">Readiness Assessment — Company Due Diligence</div>
+  </div>
+  <div class="brand"></div>
+</div>
+
+<div class="nav-bar">
+  <button class="nav-home-btn" onclick="window.location.href='Assessment_Intro.html'">&#8592; Home</button>
+  <div class="nav-tab active" onclick="goTo(1)">① Company Info</div>
+  <div class="nav-tab" onclick="goTo(2)">② Readiness Assessment</div>
+  <div class="nav-tab" onclick="goTo(3)">③ Summary</div>
+  <div class="nav-tab" onclick="goTo(4)">④ Export</div>
+</div>
+
+<!-- ============================================================
+     PAGE 1 — COMPANY INFO
+     ============================================================ -->
+<div class="page active" id="page1">
+  <div class="page-title">Company Background Information</div>
+  <div class="section-note">Complete all fields before proceeding to the assessment. Fields marked with company identity and financial data will be included in the exported report.</div>
+
+  <!-- Company & Application -->
+  <div class="card">
+    <div class="card-header">Company &amp; Application</div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Company Name *</label>
+          <input type="text" id="f-company" placeholder="Legal entity name">
+        </div>
+        <div class="form-group">
+          <label>Project / Product Name</label>
+          <input type="text" id="f-project" placeholder="Product, fund, or investment project name">
+        </div>
+        <div class="form-group">
+          <label>Date of Application</label>
+          <input type="date" id="f-date">
+        </div>
+        <div class="form-group">
+          <label>Countries of Operation</label>
+          <input type="text" id="f-countries" placeholder="e.g. Kenya, Nigeria, South Africa">
+        </div>
+        <div class="form-group span2">
+          <label>Company Description</label>
+          <textarea id="f-description" rows="3" placeholder="Brief overview of what the company does, its sector, and primary markets served"></textarea>
+        </div>
+        <div class="form-group span2">
+          <label>Business Model</label>
+          <textarea id="f-bizmodel" rows="3" placeholder="How the company generates revenue — key activities, channels, customer segments, and value proposition"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Business Profile -->
+  <div class="card">
+    <div class="card-header">Business Profile</div>
+    <div class="card-body">
+      <div class="form-grid triple">
+        <div class="form-group">
+          <label>Stage of Company</label>
+          <select id="f-stage">
+            <option value="">— Select —</option>
+            <option>Pre-revenue / Startup</option>
+            <option>Early Revenue (Seed)</option>
+            <option>Growing Revenue (Series A)</option>
+            <option>Scaling (Series B+)</option>
+            <option>Growth / Expansion Stage</option>
+            <option>Established / Mature</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Technology Stage</label>
+          <select id="f-techstage">
+            <option value="">— Select —</option>
+            <option>Concept / Ideation</option>
+            <option>R&amp;D / Prototype</option>
+            <option>Pilot / Proof-of-Concept</option>
+            <option>Early Commercial Deployment</option>
+            <option>Commercially Proven</option>
+            <option>Scaling / Industrial</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Current Number of Employees</label>
+          <input type="number" id="f-employees" placeholder="FTE headcount" min="0">
+        </div>
+        <div class="form-group span3">
+          <label>Expected Timeline to Close Funding Round</label>
+          <input type="text" id="f-timeline" placeholder="e.g. Q3 2026, within 12 months">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Financial Profile -->
+  <div class="card">
+    <div class="card-header">Financial Profile &amp; Capital Requirements</div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Funding Amount Sought (EUR)</label>
+          <input type="text" id="f-funding" placeholder="e.g. 5,000,000">
+        </div>
+        <div class="form-group">
+          <label>Current Annual Revenue (EUR)</label>
+          <input type="text" id="f-revenue" placeholder="Most recent financial year">
+        </div>
+        <div class="form-group">
+          <label>EBITDA / Profitability Status</label>
+          <select id="f-ebitda">
+            <option value="">— Select —</option>
+            <option>Pre-revenue</option>
+            <option>Revenue, loss-making</option>
+            <option>Revenue, near breakeven</option>
+            <option>EBITDA positive</option>
+            <option>Net profit positive</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Previous Capital Raised (EUR)</label>
+          <input type="text" id="f-prevcapital" placeholder="Cumulative capital raised to date">
+        </div>
+        <div class="form-group span2">
+          <label>Existing Investors / Lenders</label>
+          <input type="text" id="f-investors" placeholder="Names of existing shareholders, debt providers, or grant funders">
+        </div>
+        <div class="form-group span2">
+          <label>Use of Funds</label>
+          <textarea id="f-useoffunds" rows="2" placeholder="How proceeds will be deployed — e.g. capex, working capital, product development, market expansion"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Target Funding Instruments -->
+  <div class="card">
+    <div class="card-header">Target Funding Instrument(s)</div>
+    <div class="card-body">
+      <div class="section-note" style="margin-bottom:12px;">Select all instruments being targeted in this fundraising round.</div>
+      <div class="instruments-grid" id="instruments-grid">
+        <label class="instrument-item">
+          <input type="checkbox" class="instrument-cb" value="Equity (VC/PE)">
+          <span>Equity (VC/PE)</span>
+        </label>
+        <label class="instrument-item">
+          <input type="checkbox" class="instrument-cb" value="Convertible Note / SAFE">
+          <span>Convertible Note / SAFE</span>
+        </label>
+        <label class="instrument-item">
+          <input type="checkbox" class="instrument-cb" value="Senior Debt / Loan">
+          <span>Senior Debt / Loan</span>
+        </label>
+        <label class="instrument-item">
+          <input type="checkbox" class="instrument-cb" value="Mezzanine / Subordinated Debt">
+          <span>Mezzanine / Subordinated Debt</span>
+        </label>
+        <label class="instrument-item">
+          <input type="checkbox" class="instrument-cb" value="Working Capital Facility">
+          <span>Working Capital Facility</span>
+        </label>
+        <label class="instrument-item">
+          <input type="checkbox" class="instrument-cb" value="Blended Finance">
+          <span>Blended Finance</span>
+        </label>
+        <label class="instrument-item">
+          <input type="checkbox" class="instrument-cb" value="Project Finance">
+          <span>Project Finance</span>
+        </label>
+        <label class="instrument-item">
+          <input type="checkbox" class="instrument-cb" value="Grant">
+          <span>Grant</span>
+        </label>
+        <label class="instrument-item">
+          <input type="checkbox" class="instrument-cb" value="DFI / Development Finance">
+          <span>DFI / Development Finance</span>
+        </label>
+        <label class="instrument-item">
+          <input type="checkbox" class="instrument-cb" value="Carbon Finance">
+          <span>Carbon Finance</span>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE 2 — ASSESSMENT
+     ============================================================ -->
+<div class="page" id="page2">
+  <div class="page-title">Readiness Assessment</div>
+
+  <!-- Legend -->
+  <div class="legend-card">
+    <div class="legend-title">Score Legend</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+      <div class="legend-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+        <span class="legend-pill" style="background:var(--s0-bg);color:var(--s0-fg);">0</span>
+        <span style="color:var(--gray-600);font-size:11px;line-height:1.3;">Not started</span>
+      </div>
+      <div class="legend-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+        <span class="legend-pill" style="background:var(--s1-bg);color:var(--s1-fg);">1</span>
+        <span style="color:var(--gray-600);font-size:11px;line-height:1.3;">Process started</span>
+      </div>
+      <div class="legend-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+        <span class="legend-pill" style="background:var(--s2-bg);color:var(--s2-fg);">2</span>
+        <span style="color:var(--gray-600);font-size:11px;line-height:1.3;">Made some headway</span>
+      </div>
+      <div class="legend-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+        <span class="legend-pill" style="background:var(--s3-bg);color:var(--s3-fg);">3</span>
+        <span style="color:var(--gray-600);font-size:11px;line-height:1.3;">Almost done</span>
+      </div>
+      <div class="legend-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+        <span class="legend-pill" style="background:var(--s4-bg);color:var(--s4-fg);">4</span>
+        <span style="color:var(--gray-600);font-size:11px;line-height:1.3;">Completed</span>
+      </div>
+    </div>
+    <div style="margin-top:10px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <span style="font-size:10px;color:var(--gray-500);">
+        <span class="tag tag-crit">Critical</span>
+        <span class="tag tag-high" style="margin-left:4px;">High</span>
+        <span class="tag tag-med" style="margin-left:4px;">Medium</span>
+        <span class="tag tag-low" style="margin-left:4px;">Low</span>
+        &nbsp;Priority rating for readiness gaps
+      </span>
+    </div>
+  </div>
+
+  <div id="checklist-container"></div>
+</div>
+
+<!-- ============================================================
+     PAGE 3 — SUMMARY
+     ============================================================ -->
+<div class="page" id="page3">
+  <div class="page-title">Readiness Summary</div>
+  <div id="summary-container"></div>
+</div>
+
+<!-- ============================================================
+     PAGE 4 — EXPORT
+     ============================================================ -->
+<div class="page" id="page4">
+  <div class="page-title">Export &amp; Share</div>
+  <div class="export-section">
+    <div class="card">
+      <div class="card-body">
+        <div class="export-row">
+          <div class="export-icon">📊</div>
+          <div style="flex:1;">
+            <div class="export-title">Download Excel Workbook (.xlsx)</div>
+            <div class="export-desc">Exports a fully formatted Excel workbook with Company Info, the complete Assessment scoring, and a Legend sheet. Retains colour coding, column headers, and category groupings — suitable for sharing with advisors or investors.</div>
+            <button class="export-btn export-btn-primary" onclick="exportXLSX()">⬇ Download .xlsx</button>
+          </div>
+        </div>
+        <div class="export-row">
+          <div class="export-icon">📄</div>
+          <div style="flex:1;">
+            <div class="export-title">Download CSV (.csv)</div>
+            <div class="export-desc">Exports the assessment as a flat CSV file. Import into Google Sheets via File → Import, or use as a data source for further analysis.</div>
+            <button class="export-btn export-btn-secondary" onclick="exportCSV()">⬇ Download .csv</button>
+          </div>
+        </div>
+        <div class="export-row">
+          <div class="export-icon">🌐</div>
+          <div style="flex:1;">
+            <div class="export-title">Share with a Colleague</div>
+            <div class="export-desc">This file is a self-contained HTML page. To share: send the HTML file directly via email or Slack, or host it on any web server / cloud storage (Dropbox, Google Drive) and share the link. No installation required — the recipient opens it in any modern browser.</div>
+          </div>
+        </div>
+        <div class="export-row" style="border-bottom:none;">
+          <div class="export-icon">🏠</div>
+          <div style="flex:1;">
+            <div class="export-title">Return to Home</div>
+            <div class="export-desc">Assessment complete. Return to the Finance Assessment Navigator to start a new assessment or exit the tool.</div>
+            <button class="export-btn export-btn-secondary" onclick="window.location.href='Assessment_Intro.html'">&larr; Return to Home</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const CATEGORIES = [
+  { id:'c1', label:'Corporate & Legal', weight:0.08, items:[
+    { id:'c1_1', sub:'Incorporation',           desc:'Company is legally incorporated in relevant jurisdiction(s)',                                 rel:'All',                         gating:true,  priority:'Critical', support:'Legal' },
+    { id:'c1_2', sub:'Shareholding',            desc:'Founder equity issuance completed and cap table is current',                                 rel:'Equity, Convertible, Blended', gating:false, priority:'Critical', support:'Legal / Finance' },
+    { id:'c1_3', sub:'Shareholder arrangements',desc:'Shareholder agreement and/or founder agreement completed',                                   rel:'Equity, Convertible, Blended', gating:true,  priority:'High',     support:'Legal' },
+    { id:'c1_4', sub:'Governance documents',    desc:'Bylaws / articles of association are finalised and fit for fundraising',                     rel:'All',                         gating:true,  priority:'High',     support:'Legal' },
+    { id:'c1_5', sub:'Employment',              desc:'Employment agreements in place for key staff',                                               rel:'All',                         gating:true,  priority:'Medium',   support:'Legal / HR' },
+    { id:'c1_6', sub:'IP',                      desc:'IP ownership and IP assignment arrangements are documented',                                 rel:'Equity, Tech, Blended',       gating:true,  priority:'High',     support:'Legal' },
+    { id:'c1_7', sub:'Material contracts',      desc:'Key contracts are signed and organised',                                                     rel:'All',                         gating:true,  priority:'Critical', support:'Legal / Commercial' },
+    { id:'c1_8', sub:'Compliance',              desc:'Licences, permits, and regulatory approvals identified and tracked',                        rel:'Debt, Project Finance, Blended',gating:true, priority:'Critical', support:'Legal / Technical' },
+  ]},
+  { id:'c2', label:'Governance', weight:0.10, items:[
+    { id:'c2_1', sub:'Board',                   desc:'Board established with defined roles and cadence',                                           rel:'Equity, Debt, Blended',        gating:true,  priority:'High',     support:'Governance' },
+    { id:'c2_2', sub:'Decision-making',         desc:'Reserved matters / delegated authority framework established',                              rel:'Debt, Equity, Blended',        gating:true,  priority:'Medium',   support:'Governance / Legal' },
+    { id:'c2_3', sub:'Organisation',            desc:'Organisation chart and job descriptions documented',                                        rel:'All',                          gating:true,  priority:'Medium',   support:'HR / Operations' },
+    { id:'c2_4', sub:'Performance management',  desc:'Annual performance review process implemented',                                             rel:'All',                          gating:true,  priority:'Low',      support:'HR' },
+    { id:'c2_5', sub:'Succession planning',     desc:'Succession planning identified for critical roles',                                         rel:'Series A+, Debt, Institutional',gating:true, priority:'Low',      support:'Governance / HR' },
+  ]},
+  { id:'c3', label:'Financial Management', weight:0.20, items:[
+    { id:'c3_1',  sub:'Banking',                desc:'Corporate bank account opened and operational',                                             rel:'All',                          gating:true,  priority:'Critical', support:'Finance' },
+    { id:'c3_2',  sub:'Accounting',             desc:'Accounting system established and regularly maintained',                                    rel:'All',                          gating:true,  priority:'Critical', support:'Finance' },
+    { id:'c3_3',  sub:'Management accounts',    desc:'Up-to-date monthly management accounts available',                                          rel:'All',                          gating:true,  priority:'Critical', support:'Finance' },
+    { id:'c3_4',  sub:'Financial model',        desc:'Integrated 5-year financial model completed',                                               rel:'All',                          gating:true,  priority:'Critical', support:'Finance / Fin Modeller' },
+    { id:'c3_5',  sub:'Budgeting',              desc:'Annual budget prepared and approved',                                                       rel:'Equity, Debt, Blended',        gating:true,  priority:'High',     support:'Finance' },
+    { id:'c3_6',  sub:'Financial controls',     desc:'Financial controls and approval procedures documented',                                     rel:'Debt, Equity, Blended',        gating:true,  priority:'High',     support:'Finance' },
+    { id:'c3_7',  sub:'Audit readiness',        desc:'Historical financials are organised and DD-ready (up to last 3 months)',                    rel:'Equity, Debt, Blended',        gating:true,  priority:'High',     support:'Finance' },
+    { id:'c3_8',  sub:'Audit',                  desc:'Independently prepared / reviewed audited financial statements available',                  rel:'Series A+, Debt, Institutional',gating:true, priority:'Critical', support:'Finance / Auditor' },
+    { id:'c3_9',  sub:'Working capital',        desc:'Receivables, payables, and cash flow processes established',                                rel:'Debt, Working Capital, Blended',gating:true, priority:'Medium',   support:'Finance' },
+    { id:'c3_10', sub:'Tax',                    desc:'Tax filings are up to date and material tax risks identified',                               rel:'All',                          gating:true,  priority:'High',     support:'Finance / Tax' },
+  ]},
+  { id:'c4', label:'Commercial Readiness', weight:0.18, items:[
+    { id:'c4_1', sub:'Market proposition',      desc:'Value proposition is clearly articulated',                                                   rel:'All',                          gating:true,  priority:'High',     support:'Commercial' },
+    { id:'c4_2', sub:'Sales strategy',          desc:'Sales and marketing plan is documented',                                                    rel:'Equity, Growth, Debt',         gating:true,  priority:'High',     support:'Commercial' },
+    { id:'c4_3', sub:'CRM',                     desc:'CRM system or pipeline tracking is implemented',                                            rel:'Equity, Growth',               gating:true,  priority:'Medium',   support:'Commercial' },
+    { id:'c4_4', sub:'Revenue evidence',        desc:'Historical sales by product / category / region are documented',                            rel:'Equity, Debt, Working Capital', gating:true,  priority:'High',     support:'Finance / Commercial' },
+    { id:'c4_5', sub:'Unit economics',          desc:'Unit economics are documented and understood',                                              rel:'Equity, Debt, Growth',         gating:true,  priority:'High',     support:'Finance / Commercial' },
+    { id:'c4_6', sub:'Customer traction',       desc:'Customer traction evidenced through contracts, pilots, or recurring sales',                 rel:'Equity, Debt, Blended',        gating:true,  priority:'Critical', support:'Commercial' },
+    { id:'c4_7', sub:'Revenue visibility',      desc:'Revenue model and assumptions are clear and defensible',                                    rel:'Debt, Equity, Project Finance', gating:true,  priority:'Critical', support:'Finance / Commercial' },
+  ]},
+  { id:'c5', label:'Operational Readiness', weight:0.18, items:[
+    { id:'c5_1', sub:'SOPs',                    desc:'Core processes are documented for main business functions',                                  rel:'All',                          gating:true,  priority:'Medium',   support:'Operations' },
+    { id:'c5_2', sub:'KPIs',                    desc:'Operational KPIs are defined, tracked, and reported',                                       rel:'All',                          gating:true,  priority:'Medium',   support:'Operations' },
+    { id:'c5_3', sub:'Team capacity',           desc:'Team has capacity to execute growth and fundraising process simultaneously',                 rel:'All',                          gating:true,  priority:'High',     support:'Management' },
+    { id:'c5_4', sub:'Procurement / controls',  desc:'Procurement and approval controls are in place',                                            rel:'Debt, Project Finance, Institutional',gating:true,priority:'Medium',support:'Operations / Finance' },
+  ]},
+  { id:'c6', label:'Technology / Product', weight:0.06, items:[
+    { id:'c6_1', sub:'Validation',              desc:'Initial technology validation / pilot completed',                                            rel:'Tech, Equity, Blended',        gating:true,  priority:'Critical', support:'Technical' },
+    { id:'c6_2', sub:'Performance evidence',    desc:'Product or technology performance is evidenced with data',                                   rel:'Tech, Debt, Project Finance',  gating:true,  priority:'High',     support:'Technical' },
+    { id:'c6_3', sub:'Scalability',             desc:'Technology or product is ready for commercial scaling',                                     rel:'Equity, Growth, Project Finance',gating:true, priority:'High',     support:'Technical / Operations' },
+  ]},
+  { id:'c7', label:'ESG / Impact', weight:0.10, items:[
+    { id:'c7_1', sub:'Policy',                  desc:'Initial ESG / HSE policy statement established',                                            rel:'Debt, DFI, Blended, Institutional',gating:true,priority:'Medium', support:'ESG' },
+    { id:'c7_2', sub:'Screening',               desc:'Environmental and social risks identified and screened',                                     rel:'Debt, DFI, Project Finance, Blended',gating:true,priority:'High',support:'ESG / Legal' },
+    { id:'c7_3', sub:'Impact metrics',          desc:'Impact metrics and climate rationale defined',                                              rel:'Grant, Blended, Climate, DFI', gating:true,  priority:'Medium',   support:'ESG / Impact' },
+    { id:'c7_4', sub:'Compliance',              desc:'Labour, health &amp; safety, and compliance practices established',                         rel:'Debt, DFI, Institutional',     gating:true,  priority:'Medium',   support:'ESG / HR / Legal' },
+  ]},
+  { id:'c8', label:'Fundraising Readiness', weight:0.05, items:[
+    { id:'c8_1',  sub:'Strategy',               desc:'Funding strategy and target capital structure are defined',                                  rel:'All',                          gating:true,  priority:'Critical', support:'Finance / Strategy' },
+    { id:'c8_2',  sub:'Raise size',             desc:'Total raise amount and use of funds are clearly defined',                                   rel:'All',                          gating:true,  priority:'Critical', support:'Finance / Management' },
+    { id:'c8_3',  sub:'Materials',              desc:'Pitch deck or investor presentation completed',                                             rel:'Equity, Convertible, Blended', gating:true,  priority:'High',     support:'Management / Advisor' },
+    { id:'c8_4',  sub:'Business plan',          desc:'Business plan / investment memo completed',                                                 rel:'Debt, Equity, Blended',        gating:true,  priority:'High',     support:'Management / Advisor' },
+    { id:'c8_5',  sub:'Data room',              desc:'Basic data room established and organised',                                                 rel:'All',                          gating:true,  priority:'Critical', support:'Management / Advisor' },
+    { id:'c8_6',  sub:'Valuation',              desc:'Valuation approach is prepared and supportable',                                            rel:'Equity, Convertible',          gating:true,  priority:'Medium',   support:'Finance / Advisor' },
+    { id:'c8_7',  sub:'Prior track record',     desc:'Evidence of prior fundraising success exists',                                              rel:'Equity, Debt, Blended',        gating:true,  priority:'Medium',   support:'Management' },
+    { id:'c8_8',  sub:'Investor targeting',     desc:'Lender / investor target list developed',                                                   rel:'All',                          gating:true,  priority:'High',     support:'Advisor / Management' },
+    { id:'c8_9',  sub:'Outreach readiness',     desc:'Outreach plan, messaging, and sequencing prepared',                                         rel:'All',                          gating:true,  priority:'Medium',   support:'Advisor / Management' },
+    { id:'c8_10', sub:'Existing financing docs',desc:'Existing debt / equity financing documents reviewed',                                       rel:'Debt, Equity, Blended',        gating:true,  priority:'Medium',   support:'Legal / Finance' },
+    { id:'c8_11', sub:'Partner contracts',      desc:'Financing and partner agreements are executed or in negotiation',                           rel:'Debt, Blended, Project Finance',gating:true, priority:'Medium',   support:'Legal / Commercial' },
+  ]},
+  { id:'c9', label:'Climate / Carbon Finance', weight:0.05, items:[
+    { id:'c9_1', sub:'Carbon relevance',        desc:'Carbon asset development relevance assessed',                                                rel:'Carbon, Blended, Climate',     gating:true,  priority:'Low',      support:'Carbon / Technical' },
+    { id:'c9_2', sub:'Carbon strategy',         desc:'Carbon finance strategy developed if relevant',                                             rel:'Carbon, Blended',              gating:true,  priority:'Low',      support:'Carbon / Finance' },
+  ]},
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const state = {};
+CATEGORIES.forEach(cat => {
+  cat.items.forEach(it => {
+    state[it.id] = { status: 0, applicable: true, evidence: '', gap: '' };
+  });
+});
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goTo(n) {
+  document.querySelectorAll('.page').forEach((p,i) => p.classList.toggle('active', i+1 === n));
+  document.querySelectorAll('.nav-tab').forEach((t,i) => t.classList.toggle('active', i+1 === n));
+  if (n === 3) renderSummary();
+  window.scrollTo(0,0);
+}
+
+// ============================================================
+// CHECKLIST RENDER
+// ============================================================
+function renderChecklist() {
+  const container = document.getElementById('checklist-container');
+  container.innerHTML = CATEGORIES.map(cat => renderCategory(cat)).join('');
+  updateAllCatScores();
+}
+
+function renderCategory(cat) {
+  const totalItems = cat.items.length;
+  return `
+  <div class="cat-block" id="cat-${cat.id}">
+    <div class="cat-header" onclick="toggleCat('${cat.id}')">
+      <div class="cat-title">${cat.label}</div>
+      <div class="cat-meta">
+        <span>${totalItems} items</span>
+        <span>Weight: ${Math.round(cat.weight*100)}%</span>
+        <span class="cat-score-pill" id="score-pill-${cat.id}">0%</span>
+      </div>
+      <div class="toggle-icon">▾</div>
+    </div>
+    <div class="checklist-header">
+      <span>Assessment Item</span>
+      <span>Status</span>
+      <span style="text-align:center;">N/A</span>
+      <span>Evidence / Verification</span>
+      <span>Gap / Comment</span>
+    </div>
+    <div class="checklist-rows" id="rows-${cat.id}">
+      ${cat.items.map(it => renderItem(it)).join('')}
+    </div>
+  </div>`;
+}
+
+const PRIORITY_CLASS = { Critical:'tag-crit', High:'tag-high', Medium:'tag-med', Low:'tag-low' };
+const STATUS_LABELS = ['0 – Not started','1 – Process started','2 – Made some headway','3 – Almost done','4 – Completed'];
+
+function renderItem(it) {
+  const s = state[it.id];
+  const pClass = PRIORITY_CLASS[it.priority] || 'tag-low';
+  const naClass = s.applicable ? '' : ' na-row';
+  return `
+  <div class="checklist-row${naClass}" id="row-${it.id}">
+    <div>
+      <div class="item-desc">${it.desc}</div>
+      <div class="item-tags">
+        <span class="tag tag-sub">${it.sub}</span>
+        <span class="tag ${pClass}">${it.priority}</span>
+      </div>
+      <div class="item-rel">Relevant to: ${it.rel}</div>
+    </div>
+    <div>
+      <select class="status-select s${s.status}" id="sel-${it.id}"
+        onchange="updateStatus('${it.id}',+this.value)" ${s.applicable?'':'disabled'}>
+        ${STATUS_LABELS.map((l,i)=>`<option value="${i}" ${i===s.status?'selected':''}>${l}</option>`).join('')}
+      </select>
+    </div>
+    <div class="na-wrap">
+      <input type="checkbox" id="na-${it.id}" ${!s.applicable?'checked':''}
+        onchange="updateApplicable('${it.id}',!this.checked)">
+      <label for="na-${it.id}">N/A</label>
+    </div>
+    <div>
+      <textarea class="item-note" id="ev-${it.id}" placeholder="Evidence or document reference…"
+        oninput="state['${it.id}'].evidence=this.value" ${s.applicable?'':'disabled'}>${s.evidence}</textarea>
+    </div>
+    <div>
+      <textarea class="item-note" id="gap-${it.id}" placeholder="Gap description or action needed…"
+        oninput="state['${it.id}'].gap=this.value" ${s.applicable?'':'disabled'}>${s.gap}</textarea>
+    </div>
+  </div>`;
+}
+
+function toggleCat(id) {
+  const rows = document.getElementById('rows-'+id);
+  const hdr  = rows.previousElementSibling.previousElementSibling;
+  const icon = hdr.querySelector('.toggle-icon');
+  const collapsed = rows.style.display === 'none';
+  rows.style.display = collapsed ? '' : 'none';
+  rows.previousElementSibling.style.display = collapsed ? '' : 'none';
+  hdr.classList.toggle('collapsed', !collapsed);
+}
+
+// ============================================================
+// STATE UPDATES
+// ============================================================
+function updateStatus(id, val) {
+  state[id].status = val;
+  const sel = document.getElementById('sel-'+id);
+  sel.className = 'status-select s'+val;
+  // find which category this item belongs to and update score
+  const cat = CATEGORIES.find(c => c.items.some(it => it.id === id));
+  if (cat) updateCatScore(cat);
+}
+
+function updateApplicable(id, val) {
+  state[id].applicable = val;
+  const row = document.getElementById('row-'+id);
+  row.classList.toggle('na-row', !val);
+  ['sel-','ev-','gap-'].forEach(pfx => {
+    const el = document.getElementById(pfx+id);
+    if (el) el.disabled = !val;
+  });
+  const cat = CATEGORIES.find(c => c.items.some(it => it.id === id));
+  if (cat) updateCatScore(cat);
+}
+
+function updateCatScore(cat) {
+  const applicable = cat.items.filter(it => state[it.id].applicable);
+  let pct = 0;
+  if (applicable.length > 0) {
+    const avg = applicable.reduce((s,it) => s + state[it.id].status, 0) / applicable.length;
+    pct = Math.round(avg / 4 * 100);
+  }
+  const pill = document.getElementById('score-pill-'+cat.id);
+  if (pill) pill.textContent = pct + '%';
+}
+
+function updateAllCatScores() {
+  CATEGORIES.forEach(cat => updateCatScore(cat));
+}
+
+// ============================================================
+// SUMMARY
+// ============================================================
+function computeWeightedScore() {
+  let wSum = 0, wUsed = 0;
+  CATEGORIES.forEach(cat => {
+    const applicable = cat.items.filter(it => state[it.id].applicable);
+    if (!applicable.length) return;
+    const avgNorm = applicable.reduce((s,it) => s + state[it.id].status, 0) / (applicable.length * 4);
+    wSum  += avgNorm * cat.weight;
+    wUsed += cat.weight;
+  });
+  return wUsed > 0 ? Math.round(wSum / wUsed * 100) : 0;
+}
+
+function renderSummary() {
+  const allItems = CATEGORIES.flatMap(c => c.items);
+  const applicable = allItems.filter(it => state[it.id].applicable);
+  const total   = allItems.length;
+  const naCount = allItems.filter(it => !state[it.id].applicable).length;
+  const done    = applicable.filter(it => state[it.id].status === 4).length;
+  const progress= applicable.filter(it => state[it.id].status > 0 && state[it.id].status < 4).length;
+  const notStarted = applicable.filter(it => state[it.id].status === 0).length;
+  const overallPct = computeWeightedScore();
+
+  document.getElementById('summary-container').innerHTML = `
+  <!-- Stat cards -->
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-lbl">Total Items</div></div>
+    <div class="stat-card" style="border-top-color:#6EE7B7;"><div class="stat-num" style="color:#065F46;">${done}</div><div class="stat-lbl">Finalised (Score 4)</div></div>
+    <div class="stat-card" style="border-top-color:#93C5FD;"><div class="stat-num" style="color:#1E40AF;">${progress}</div><div class="stat-lbl">In Progress (1–3)</div></div>
+    <div class="stat-card" style="border-top-color:#FCD34D;"><div class="stat-num" style="color:#92400E;">${notStarted}</div><div class="stat-lbl">Not Started (0)</div></div>
+    <div class="stat-card" style="border-top-color:var(--gray-300);"><div class="stat-num" style="color:var(--gray-500);">${naCount}</div><div class="stat-lbl">Not Applicable</div></div>
+  </div>
+
+  <!-- Weighted score -->
+  <div class="score-card">
+    <div>
+      <div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Weighted Readiness Score</div>
+      <div style="display:flex;align-items:baseline;gap:4px;">
+        <span class="score-num">${overallPct}</span>
+        <span class="score-pct">%</span>
+      </div>
+      <div class="score-label">Across all 9 categories, weighted by importance</div>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-track">
+        <div class="score-bar-fill" style="width:${overallPct}%"></div>
+      </div>
+      <div class="score-bar-label">${overallPct < 40 ? 'Early stage — significant gaps remain' : overallPct < 70 ? 'Making progress — key areas still to complete' : overallPct < 90 ? 'Good readiness — minor gaps to close' : 'Investor-ready — excellent preparation'}</div>
+    </div>
+  </div>
+
+  <!-- Category breakdown -->
+  <div class="card" style="margin-bottom:18px;">
+    <div class="card-header">Score by Category</div>
+    <div>
+      ${CATEGORIES.map(cat => {
+        const applicable = cat.items.filter(it => state[it.id].applicable);
+        let pct = 0;
+        if (applicable.length) {
+          const avg = applicable.reduce((s,it) => s+state[it.id].status, 0) / applicable.length;
+          pct = Math.round(avg/4*100);
+        }
+        const fillColor = pct >= 75 ? '#6EE7B7' : pct >= 40 ? '#93C5FD' : '#FCD34D';
+        return `<div class="cat-summary-row">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--gray-900);">${cat.label}</div>
+            <div style="font-size:10px;color:var(--gray-500);">${applicable.length} of ${cat.items.length} applicable · weight ${Math.round(cat.weight*100)}%</div>
+          </div>
+          <div class="cat-prog-track">
+            <div class="cat-prog-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--blue),${fillColor});"></div>
+          </div>
+          <div class="cat-prog-pct">${pct}%</div>
+          <div style="font-size:10px;color:var(--gray-500);text-align:right;">${Math.round(cat.weight*100)}% wt</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  `;
+}
+
+// ============================================================
+// COMPANY INFO
+// ============================================================
+function getCompanyInfo() {
+  const instruments = Array.from(document.querySelectorAll('.instrument-cb:checked')).map(cb => cb.value).join(', ') || '—';
+  return {
+    'Company Name':                   document.getElementById('f-company').value    || '—',
+    'Project / Product Name':         document.getElementById('f-project').value    || '—',
+    'Date of Application':            document.getElementById('f-date').value       || '—',
+    'Countries of Operation':         document.getElementById('f-countries').value  || '—',
+    'Company Description':            document.getElementById('f-description').value|| '—',
+    'Business Model':                 document.getElementById('f-bizmodel').value   || '—',
+    'Stage of Company':               document.getElementById('f-stage').value      || '—',
+    'Technology Stage':               document.getElementById('f-techstage').value  || '—',
+    'Number of Employees':            document.getElementById('f-employees').value  || '—',
+    'Expected Timeline':              document.getElementById('f-timeline').value   || '—',
+    'Funding Amount Sought (EUR)':    document.getElementById('f-funding').value    || '—',
+    'Target Funding Instrument(s)':   instruments,
+    'Use of Funds':                   document.getElementById('f-useoffunds').value || '—',
+    'Current Annual Revenue (EUR)':   document.getElementById('f-revenue').value    || '—',
+    'EBITDA / Profitability Status':  document.getElementById('f-ebitda').value     || '—',
+    'Previous Capital Raised (EUR)':  document.getElementById('f-prevcapital').value|| '—',
+    'Existing Investors / Lenders':   document.getElementById('f-investors').value  || '—',
+  };
+}
+
+// ============================================================
+// EXPORT — XLSX (ExcelJS)
+// ============================================================
+const BLUE_DK  = 'FF0D4F7C';
+const BLUE_MD  = 'FF1A6FA8';
+const BLUE_LT  = 'FFD0E8F5';
+const BLUE_XLT = 'FFE8F3FA';
+const WHITE    = 'FFFFFFFF';
+const GRAY_100 = 'FFF3F4F6';
+const GRAY_200 = 'FFE5E7EB';
+const GRAY_50  = 'FFF9FAFB';
+
+const S_BG = ['FFE5E7EB','FFFEF3C7','FFDBEAFE','FFF5F3FF','FFD1FAE5'];
+const S_FG = ['FF6B7280','FF92400E','FF1E40AF','FF5B21B6','FF065F46'];
+
+const PRIO_BG = { Critical:'FFFEE2E2', High:'FFFEF3C7', Medium:'FFDBEAFE', Low:'FFF3F4F6' };
+const PRIO_FG = { Critical:'FFDC2626', High:'FF92400E', Medium:'FF1E40AF', Low:'FF6B7280' };
+
+function bd(c) {
+  const side = { style:'thin', color:{ argb: c||GRAY_200 }};
+  return { top:side, left:side, bottom:side, right:side };
+}
+
+function sty(cell, opts) {
+  const { bg=WHITE, fg='FF1F2937', bold=false, size=10, italic=false,
+          halign='left', valign='middle', wrap=true, indent=0, bdc=GRAY_200 } = opts;
+  cell.fill      = { type:'pattern', pattern:'solid', fgColor:{ argb: bg }};
+  cell.font      = { bold, italic, size, color:{ argb: fg }, name:'Calibri' };
+  cell.alignment = { horizontal: halign, vertical: valign, wrapText: wrap, indent };
+  cell.border    = bd(bdc);
+}
+
+const STATUS_TEXT = ['Not started','Process started','Made some headway','Almost done','Completed'];
+
+async function exportXLSX() {
+  const info = getCompanyInfo();
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Corporate Finance Status Checklist';
+  wb.created = new Date();
+
+  // ---- Sheet 1: Company Info ----
+  const ws1 = wb.addWorksheet('Company Information');
+  ws1.columns = [
+    { width:32 }, { width:55 }
+  ];
+
+  // Header banner
+  const h1 = ws1.addRow(['Corporate Finance Status Checklist — Company Information','']);
+  h1.height = 30;
+  ws1.mergeCells('A1:B1');
+  sty(ws1.getCell('A1'), { bg:BLUE_DK, fg:WHITE, bold:true, size:14, halign:'center', valign:'middle' });
+
+  const h2 = ws1.addRow(['Investment Readiness Platform','']);
+  ws1.mergeCells('A2:B2');
+  sty(ws1.getCell('A2'), { bg:BLUE_MD, fg:WHITE, bold:false, size:10, halign:'center', italic:true });
+
+  ws1.addRow([]);
+
+  // Section headers / field groups
+  const sections = [
+    { header:'Company & Application', fields:['Company Name','Project / Product Name','Date of Application','Countries of Operation','Company Description','Business Model'] },
+    { header:'Business Profile', fields:['Stage of Company','Technology Stage','Number of Employees','Expected Timeline'] },
+    { header:'Financial Profile & Capital Requirements', fields:['Funding Amount Sought (EUR)','Target Funding Instrument(s)','Use of Funds','Current Annual Revenue (EUR)','EBITDA / Profitability Status','Previous Capital Raised (EUR)','Existing Investors / Lenders'] },
+  ];
+
+  sections.forEach(sec => {
+    const shdr = ws1.addRow([sec.header,'']);
+    ws1.mergeCells(`A${shdr.number}:B${shdr.number}`);
+    shdr.height = 20;
+    sty(ws1.getCell(`A${shdr.number}`), { bg:BLUE_LT, fg:BLUE_DK, bold:true, size:11, halign:'left', indent:1 });
+
+    sec.fields.forEach(f => {
+      const val = info[f];
+      const r = ws1.addRow([f, val]);
+      r.height = 16;
+      sty(ws1.getCell(`A${r.number}`), { bg:GRAY_100, fg:'FF374151', bold:true, size:10, indent:1 });
+      sty(ws1.getCell(`B${r.number}`), { bg:WHITE, fg:'FF111827', bold:false, size:10, indent:1 });
+      if (val && val.length > 60) { r.height = 32; }
+    });
+    ws1.addRow([]);
+  });
+
+  // ---- Sheet 2: Assessment ----
+  const ws2 = wb.addWorksheet('Readiness Assessment');
+  ws2.columns = [
+    { width:26 }, // Category
+    { width:22 }, // Sub-category
+    { width:48 }, // Assessment Item
+    { width:22 }, // Financing Relevance
+    { width:8  }, // Score
+    { width:18 }, // Status Label
+    { width:10 }, // Priority
+    { width:11 }, // Applicable
+    { width:36 }, // Evidence
+    { width:36 }, // Gap / Comment
+    { width:24 }, // Support Needed
+  ];
+
+  // Title
+  const t1 = ws2.addRow(['Corporate Finance Status Checklist — Readiness Assessment','','','','','','','','','','']);
+  t1.height = 30;
+  ws2.mergeCells('A1:K1');
+  sty(ws2.getCell('A1'), { bg:BLUE_DK, fg:WHITE, bold:true, size:14, halign:'center', valign:'middle' });
+
+  const t2 = ws2.addRow(['Exported: '+new Date().toLocaleDateString('en-GB')+'  ·  Company: '+(info['Company Name']||'—'),'','','','','','','','','','']);
+  ws2.mergeCells('A2:K2');
+  sty(ws2.getCell('A2'), { bg:BLUE_MD, fg:WHITE, bold:false, size:10, halign:'center', italic:true });
+
+  ws2.addRow([]);
+
+  // Column headers
+  const cols = ['Category','Sub-category','Assessment Item','Financing Relevance','Score','Status','Priority','Applicable?','Evidence / Verification','Gap / Comment','Support Needed'];
+  const hdrRow = ws2.addRow(cols);
+  hdrRow.height = 24;
+  cols.forEach((_, i) => {
+    const cell = ws2.getCell(hdrRow.number, i+1);
+    sty(cell, { bg:BLUE_DK, fg:WHITE, bold:true, size:10, halign:'center', valign:'middle', bdc:BLUE_MD });
+  });
+  ws2.getRow(hdrRow.number).views = [{ state:'frozen' }];
+
+  CATEGORIES.forEach(cat => {
+    // Category header row
+    const catRow = ws2.addRow([cat.label,'','','','','','','','','','']);
+    catRow.height = 20;
+    ws2.mergeCells(`A${catRow.number}:K${catRow.number}`);
+    sty(ws2.getCell(`A${catRow.number}`), { bg:BLUE_MD, fg:WHITE, bold:true, size:11, indent:1, bdc:BLUE_MD });
+    const applicable = cat.items.filter(it => state[it.id].applicable);
+    const catPct = applicable.length
+      ? Math.round(applicable.reduce((s,it) => s+state[it.id].status, 0) / (applicable.length*4) * 100)
+      : 0;
+    ws2.getCell(`A${catRow.number}`).value = `${cat.label}   [Weight: ${Math.round(cat.weight*100)}%  |  Category Score: ${catPct}%]`;
+
+    cat.items.forEach(it => {
+      const s = state[it.id];
+      const rowBg = s.applicable ? (s.status === 4 ? 'FFF0FDF4' : WHITE) : GRAY_100;
+      const dataRow = ws2.addRow([
+        cat.label,
+        it.sub,
+        it.desc.replace(/&amp;/g,'&'),
+        it.rel,
+        s.applicable ? s.status : '—',
+        s.applicable ? STATUS_TEXT[s.status] : 'N/A',
+        it.priority,
+        s.applicable ? 'Yes' : 'No',
+        s.evidence || '',
+        s.gap || '',
+        it.support,
+      ]);
+      dataRow.height = 16;
+
+      // Category col
+      sty(ws2.getCell(dataRow.number,1),  { bg:BLUE_XLT, fg:BLUE_DK, bold:false, size:10, indent:1 });
+      // Sub-category col
+      sty(ws2.getCell(dataRow.number,2),  { bg:GRAY_100,  fg:'FF4B5563', bold:false, size:10, indent:1 });
+      // Description
+      sty(ws2.getCell(dataRow.number,3),  { bg:rowBg, fg:'FF111827', bold:false, size:10, indent:1 });
+      if ((it.desc||'').length > 60) dataRow.height = 28;
+      // Rel
+      sty(ws2.getCell(dataRow.number,4),  { bg:rowBg, fg:'FF6B7280', bold:false, size:9, italic:true });
+      // Score
+      if (s.applicable) {
+        sty(ws2.getCell(dataRow.number,5), { bg:S_BG[s.status], fg:S_FG[s.status], bold:true, size:11, halign:'center' });
+      } else {
+        sty(ws2.getCell(dataRow.number,5), { bg:GRAY_200, fg:'FF9CA3AF', bold:false, size:10, halign:'center' });
+      }
+      // Status label
+      if (s.applicable) {
+        sty(ws2.getCell(dataRow.number,6), { bg:S_BG[s.status], fg:S_FG[s.status], bold:false, size:9 });
+      } else {
+        sty(ws2.getCell(dataRow.number,6), { bg:GRAY_200, fg:'FF9CA3AF', bold:false, size:9, halign:'center' });
+      }
+      // Priority
+      sty(ws2.getCell(dataRow.number,7),  { bg: PRIO_BG[it.priority]||GRAY_100, fg: PRIO_FG[it.priority]||'FF6B7280', bold:true, size:9, halign:'center' });
+      // Applicable
+      sty(ws2.getCell(dataRow.number,8),  { bg: s.applicable ? 'FFD1FAE5' : GRAY_200, fg: s.applicable ? 'FF065F46' : 'FF9CA3AF', bold:false, size:9, halign:'center' });
+      // Evidence, Gap, Support
+      sty(ws2.getCell(dataRow.number,9),  { bg:rowBg, fg:'FF374151', bold:false, size:10, wrap:true });
+      sty(ws2.getCell(dataRow.number,10), { bg:rowBg, fg:'FF374151', bold:false, size:10, wrap:true });
+      sty(ws2.getCell(dataRow.number,11), { bg:GRAY_100, fg:'FF6B7280', bold:false, size:9, italic:true });
+    });
+  });
+
+  // Summary table at bottom of Assessment
+  ws2.addRow([]);
+  const sumHdr = ws2.addRow(['SUMMARY: Weighted Readiness Score','','','',computeWeightedScore()+'%','','','','','','']);
+  ws2.mergeCells(`A${sumHdr.number}:D${sumHdr.number}`);
+  ws2.mergeCells(`E${sumHdr.number}:K${sumHdr.number}`);
+  sty(ws2.getCell(`A${sumHdr.number}`), { bg:BLUE_DK, fg:WHITE, bold:true, size:11 });
+  sty(ws2.getCell(`E${sumHdr.number}`), { bg:BLUE_DK, fg:WHITE, bold:true, size:14, halign:'center' });
+  sumHdr.height = 24;
+
+  ws2.addRow([]);
+  const catSumHdr = ws2.addRow(['Category','Weight','Score (%)','Applicable Items','Total Items','','','','','','']);
+  catSumHdr.height = 18;
+  ['A','B','C','D','E'].forEach(col => {
+    sty(ws2.getCell(`${col}${catSumHdr.number}`), { bg:BLUE_MD, fg:WHITE, bold:true, size:10, halign:'center' });
+  });
+
+  CATEGORIES.forEach(cat => {
+    const applicable = cat.items.filter(it => state[it.id].applicable);
+    const pct = applicable.length
+      ? Math.round(applicable.reduce((s,it) => s+state[it.id].status,0) / (applicable.length*4)*100)
+      : 0;
+    const cr = ws2.addRow([cat.label, Math.round(cat.weight*100)+'%', pct+'%', applicable.length, cat.items.length,'','','','','','']);
+    cr.height = 16;
+    sty(ws2.getCell(cr.number,1), { bg:BLUE_XLT, fg:BLUE_DK, bold:true, size:10, indent:1 });
+    sty(ws2.getCell(cr.number,2), { bg:WHITE, fg:'FF374151', bold:false, size:10, halign:'center' });
+    sty(ws2.getCell(cr.number,3), { bg: pct>=75?'FFD1FAE5':pct>=40?'FFDBEAFE':'FFFEF3C7', fg: pct>=75?'FF065F46':pct>=40?'FF1E40AF':'FF92400E', bold:true, size:10, halign:'center' });
+    sty(ws2.getCell(cr.number,4), { bg:WHITE, fg:'FF374151', bold:false, size:10, halign:'center' });
+    sty(ws2.getCell(cr.number,5), { bg:WHITE, fg:'FF374151', bold:false, size:10, halign:'center' });
+  });
+
+  // ---- Sheet 3: Legend ----
+  const ws3 = wb.addWorksheet('Legend');
+  ws3.columns = [{ width:8 }, { width:24 }, { width:48 }];
+
+  const l1 = ws3.addRow(['Assessment Score Legend','','']);
+  ws3.mergeCells('A1:C1');
+  l1.height = 28;
+  sty(ws3.getCell('A1'), { bg:BLUE_DK, fg:WHITE, bold:true, size:13, halign:'center', valign:'middle' });
+
+  ws3.addRow([]);
+
+  [
+    [0,'Not started','No work done, no evidence available'],
+    [1,'Process started','Work has begun — early action underway'],
+    [2,'Made some headway','Meaningful progress made, but gaps remain'],
+    [3,'Almost done','Near-final and usable, minor gaps only'],
+    [4,'Completed','Finalised, approved / adopted'],
+  ].forEach(([score, label, desc]) => {
+    const r = ws3.addRow([score, label, desc]);
+    r.height = 20;
+    sty(ws3.getCell(r.number,1), { bg:S_BG[score], fg:S_FG[score], bold:true, size:12, halign:'center' });
+    sty(ws3.getCell(r.number,2), { bg:S_BG[score], fg:S_FG[score], bold:true, size:10, indent:1 });
+    sty(ws3.getCell(r.number,3), { bg:WHITE, fg:'FF374151', bold:false, size:10, indent:1 });
+  });
+
+  ws3.addRow([]);
+
+  const ph = ws3.addRow(['Priority Levels','','']);
+  ws3.mergeCells(`A${ph.number}:C${ph.number}`);
+  ph.height = 20;
+  sty(ws3.getCell(`A${ph.number}`), { bg:BLUE_MD, fg:WHITE, bold:true, size:11, halign:'center' });
+
+  [
+    ['Critical','FFFEE2E2','FFDC2626','Must be resolved before investor engagement — fundamental requirement'],
+    ['High',    'FFFEF3C7','FF92400E','Important for investor confidence — address early in preparation'],
+    ['Medium',  'FFDBEAFE','FF1E40AF','Relevant for certain instruments — address during due diligence phase'],
+    ['Low',     'FFF3F4F6','FF6B7280','Nice to have for advanced mandates — address when capacity allows'],
+  ].forEach(([prio, bg, fg, desc]) => {
+    const r = ws3.addRow([prio,'', desc]);
+    ws3.mergeCells(`A${r.number}:B${r.number}`);
+    r.height = 18;
+    sty(ws3.getCell(r.number,1), { bg, fg, bold:true, size:10, halign:'center' });
+    sty(ws3.getCell(r.number,3), { bg:WHITE, fg:'FF374151', bold:false, size:10, indent:1 });
+  });
+
+  ws3.addRow([]);
+  const wh = ws3.addRow(['Category Weights','','']);
+  ws3.mergeCells(`A${wh.number}:C${wh.number}`);
+  wh.height = 20;
+  sty(ws3.getCell(`A${wh.number}`), { bg:BLUE_MD, fg:WHITE, bold:true, size:11, halign:'center' });
+
+  CATEGORIES.forEach(cat => {
+    const r = ws3.addRow([Math.round(cat.weight*100)+'%', cat.label, `${cat.items.length} items`]);
+    r.height = 16;
+    sty(ws3.getCell(r.number,1), { bg:BLUE_XLT, fg:BLUE_DK, bold:true, size:10, halign:'center' });
+    sty(ws3.getCell(r.number,2), { bg:WHITE, fg:'FF374151', bold:false, size:10, indent:1 });
+    sty(ws3.getCell(r.number,3), { bg:GRAY_100, fg:'FF6B7280', bold:false, size:9, halign:'center' });
+  });
+
+  // ---- Write & download ----
+  const buf = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const co = (document.getElementById('f-company').value || 'Company').replace(/[^a-zA-Z0-9]/g,'_');
+  a.download = `Corporate_Finance_Checklist_${co}_${new Date().toISOString().slice(0,10)}.xlsx`;
+  a.click();
+  showToast('Excel workbook downloaded');
+}
+
+// ============================================================
+// EXPORT — CSV
+// ============================================================
+function exportCSV() {
+  const info = getCompanyInfo();
+  const esc = v => `"${String(v||'').replace(/"/g,'""')}"`;
+  const rows = [
+    ['CORPORATE FINANCE STATUS CHECKLIST','','','','','','','','','','',''],
+    ['Company:', info['Company Name'], 'Date:', info['Date of Application'],'','','','','','','',''],
+    [],
+    ['Category','Sub-category','Assessment Item','Financing Relevance','Score','Status','Priority','Applicable?','Evidence / Verification','Gap / Comment','Support Needed'],
+  ];
+
+  CATEGORIES.forEach(cat => {
+    rows.push([`=== ${cat.label} (Weight: ${Math.round(cat.weight*100)}%) ===`,'','','','','','','','','','','']);
+    cat.items.forEach(it => {
+      const s = state[it.id];
+      rows.push([
+        cat.label,
+        it.sub,
+        it.desc.replace(/&amp;/g,'&'),
+        it.rel,
+        s.applicable ? s.status : 'N/A',
+        s.applicable ? STATUS_TEXT[s.status] : 'Not Applicable',
+        it.priority,
+        s.applicable ? 'Yes' : 'No',
+        s.evidence || '',
+        s.gap || '',
+        it.support,
+      ]);
+    });
+    rows.push([]);
+  });
+
+  rows.push(['WEIGHTED READINESS SCORE:', computeWeightedScore()+'%','','','','','','','','','','']);
+
+  const csv = rows.map(r => r.map(esc).join(',')).join('\r\n');
+  const blob = new Blob(['﻿'+csv], { type:'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const co = (document.getElementById('f-company').value || 'Company').replace(/[^a-zA-Z0-9]/g,'_');
+  a.download = `Corporate_Finance_Checklist_${co}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('CSV downloaded — import to Google Sheets via File → Import');
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ============================================================
+// INSTRUMENT CHECKBOX STYLING
+// ============================================================
+function initInstruments() {
+  document.querySelectorAll('.instrument-cb').forEach(cb => {
+    cb.addEventListener('change', () => {
+      cb.closest('.instrument-item').classList.toggle('checked', cb.checked);
+    });
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  renderChecklist();
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+  initInstruments();
+});
+</script>
+</body>
+</html>

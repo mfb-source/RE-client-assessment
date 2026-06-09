@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance Assessment Navigator</title>
+<style>
+  :root {
+    --blue-dk: #0D4F7C; --blue: #1A6FA8; --blue-md: #2581C4;
+    --blue-lt: #D0E8F5; --blue-xlt: #EBF5FF;
+    --gray-900: #111827; --gray-700: #374151; --gray-600: #4B5563;
+    --gray-500: #6B7280; --gray-400: #9CA3AF; --gray-300: #D1D5DB;
+    --gray-100: #F3F4F6; --white: #FFFFFF;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+    background: #EFF3F7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  /* Background decoration */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 15% 20%, rgba(26,111,168,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 85% 80%, rgba(13,79,124,0.08) 0%, transparent 55%),
+      linear-gradient(160deg, #EBF5FF 0%, #EFF3F7 40%, #E8F3FA 100%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 920px; width: 100%;
+    text-align: center;
+  }
+
+  /* Logo mark */
+  .logo-wrap {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin-bottom: 28px;
+  }
+  .logo-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--blue-dk), var(--blue-md));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 10px rgba(13,79,124,0.3);
+  }
+  .logo-text {
+    font-size: 13px; font-weight: 700; color: var(--blue-dk);
+    letter-spacing: 0.8px; text-transform: uppercase;
+  }
+  .logo-sub {
+    font-size: 11px; color: var(--gray-400); font-weight: 500; margin-top: 2px;
+  }
+
+  /* Title */
+  .main-title {
+    font-size: 36px; font-weight: 800; color: var(--blue-dk);
+    letter-spacing: -0.5px; line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  /* Question */
+  .question {
+    font-size: 17px; color: var(--gray-700); font-weight: 500;
+    line-height: 1.5; margin-bottom: 48px;
+    max-width: 660px; margin-left: auto; margin-right: auto;
+  }
+
+  /* Cards */
+  .cards {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    margin-bottom: 36px;
+  }
+
+  .choice-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 36px 28px 32px;
+    cursor: pointer;
+    border: 2px solid var(--blue-lt);
+    box-shadow: 0 4px 20px rgba(13,79,124,0.09);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .choice-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 40px rgba(13,79,124,0.18);
+    border-color: var(--blue);
+  }
+  .choice-card:active { transform: translateY(-2px); }
+
+  .card-graphic {
+    width: 110px; height: 110px;
+    margin-bottom: 22px;
+    filter: drop-shadow(0 4px 12px rgba(13,79,124,0.15));
+  }
+  .card-title {
+    font-size: 22px; font-weight: 800; color: var(--blue-dk);
+    margin-bottom: 10px; letter-spacing: -0.2px;
+  }
+  .card-desc {
+    font-size: 13px; color: var(--gray-500); line-height: 1.6;
+    margin-bottom: 24px; flex: 1;
+  }
+  .start-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: linear-gradient(135deg, var(--blue-dk), var(--blue));
+    color: white;
+    padding: 11px 22px;
+    border-radius: 7px;
+    font-size: 13px; font-weight: 700; font-family: inherit;
+    border: none; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(13,79,124,0.3);
+    transition: box-shadow 0.15s, filter 0.15s;
+  }
+  .start-btn:hover { filter: brightness(1.1); box-shadow: 0 4px 16px rgba(13,79,124,0.4); }
+
+  /* Exit button */
+  .exit-wrap { margin-top: 4px; }
+  .exit-btn {
+    background: none;
+    border: 1.5px solid var(--gray-300);
+    color: var(--gray-500);
+    padding: 9px 28px;
+    border-radius: 7px;
+    font-size: 12px; font-weight: 600; font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .exit-btn:hover { background: var(--gray-100); color: var(--gray-700); border-color: var(--gray-400); }
+
+  /* Exit overlay */
+  .overlay {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(13,30,55,0.55); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  .overlay.show { display: flex; }
+  .overlay-box {
+    background: white; border-radius: 16px;
+    padding: 40px 44px; max-width: 400px; width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .overlay-icon { font-size: 44px; margin-bottom: 16px; }
+  .overlay-title { font-size: 20px; font-weight: 800; color: var(--blue-dk); margin-bottom: 8px; }
+  .overlay-text { font-size: 13px; color: var(--gray-500); line-height: 1.6; margin-bottom: 24px; }
+  .overlay-close {
+    background: var(--gray-100); border: 1.5px solid var(--gray-300);
+    color: var(--gray-700); padding: 9px 24px;
+    border-radius: 7px; font-size: 13px; font-weight: 600;
+    font-family: inherit; cursor: pointer;
+  }
+  .overlay-close:hover { background: var(--gray-200); }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Logo -->
+  <div class="logo-wrap">
+    <div class="logo-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M3 18 L8 12 L13 15 L21 6" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M17 6 L21 6 L21 10" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">Finance Assessment Navigator</div>
+      <div class="logo-sub">Select the type of transaction to assess</div>
+    </div>
+  </div>
+
+  <!-- Title -->
+  <h1 class="main-title">What are you assessing?</h1>
+
+  <!-- Question -->
+  <p class="question">Is this a Project Finance transaction or a Corporate Finance deal? Select the appropriate assessment below to begin.</p>
+
+  <!-- Cards -->
+  <div class="cards">
+
+    <!-- Project Finance Card -->
+    <div class="choice-card" onclick="goTo('IPP_Checklist_App.html')">
+      <div class="card-graphic">
+        <!-- Project Finance SVG: Transmission pylon with cables -->
+        <svg viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="55" cy="55" r="55" fill="#DBEAFE"/>
+          <!-- Sun -->
+          <circle cx="87" cy="24" r="10" fill="#FCD34D" opacity="0.9"/>
+          <line x1="87" y1="11" x2="87" y2="7"  stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+          <line x1="87" y1="37" x2="87" y2="41" stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+          <line x1="74" y1="24" x2="70" y2="24" stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+          <line x1="100" y1="24" x2="104" y2="24" stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+          <line x1="78" y1="15" x2="75" y2="12" stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+          <line x1="96" y1="33" x2="99" y2="36" stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+          <!-- Pylon body (triangle) -->
+          <path d="M55 20 L44 88 L66 88 Z" fill="none" stroke="#0D4F7C" stroke-width="3" stroke-linejoin="round"/>
+          <!-- Cross members -->
+          <line x1="46" y1="43" x2="64" y2="43" stroke="#0D4F7C" stroke-width="2"/>
+          <line x1="45" y1="60" x2="65" y2="60" stroke="#0D4F7C" stroke-width="2"/>
+          <line x1="44" y1="75" x2="66" y2="75" stroke="#0D4F7C" stroke-width="2"/>
+          <!-- Top arm -->
+          <line x1="41" y1="30" x2="69" y2="30" stroke="#0D4F7C" stroke-width="2.5"/>
+          <!-- Insulators -->
+          <circle cx="41" cy="30" r="3" fill="#1A6FA8"/>
+          <circle cx="69" cy="30" r="3" fill="#1A6FA8"/>
+          <!-- Catenary cable left — two wires -->
+          <path d="M14 37 Q27 32 41 30" stroke="#2581C4" stroke-width="1.8" fill="none"/>
+          <path d="M14 44 Q27 39 41 30" stroke="#2581C4" stroke-width="1.4" fill="none" opacity="0.6"/>
+          <!-- Catenary cable right -->
+          <path d="M69 30 Q83 32 96 37" stroke="#2581C4" stroke-width="1.8" fill="none"/>
+          <path d="M69 30 Q83 39 96 44" stroke="#2581C4" stroke-width="1.4" fill="none" opacity="0.6"/>
+          <!-- Pylon feet -->
+          <line x1="44" y1="88" x2="38" y2="97" stroke="#0D4F7C" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="66" y1="88" x2="72" y2="97" stroke="#0D4F7C" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Ground line -->
+          <line x1="28" y1="99" x2="82" y2="99" stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 class="card-title">Project Finance</h2>
+      <p class="card-desc">Large-scale infrastructure, energy and utility projects requiring structured, ring-fenced project-level financing and bankability assessment.</p>
+      <button class="start-btn">Begin Assessment &rarr;</button>
+    </div>
+
+    <!-- Corporate Finance Card -->
+    <div class="choice-card" onclick="goTo('Corporate_Finance_Checklist_App.html')">
+      <div class="card-graphic">
+        <!-- Corporate Finance SVG: City buildings + upward trend -->
+        <svg viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="55" cy="55" r="55" fill="#DBEAFE"/>
+          <!-- Left building (short) -->
+          <rect x="13" y="54" width="22" height="46" fill="#2581C4" rx="3"/>
+          <rect x="17" y="60" width="5" height="5" fill="white" opacity="0.65" rx="1"/>
+          <rect x="25" y="60" width="5" height="5" fill="white" opacity="0.65" rx="1"/>
+          <rect x="17" y="70" width="5" height="5" fill="white" opacity="0.65" rx="1"/>
+          <rect x="25" y="70" width="5" height="5" fill="white" opacity="0.65" rx="1"/>
+          <rect x="17" y="80" width="5" height="5" fill="white" opacity="0.65" rx="1"/>
+          <rect x="25" y="80" width="5" height="5" fill="white" opacity="0.65" rx="1"/>
+          <!-- Right building (medium) -->
+          <rect x="75" y="44" width="22" height="56" fill="#2581C4" rx="3"/>
+          <rect x="79" y="50" width="5" height="5" fill="white" opacity="0.65" rx="1"/>
+          <rect x="87" y="50" width="5" height="5" fill="white" opacity="0.65" rx="1"/>
+          <rect x="79" y="61" width="5" height="5" fill="white" opacity="0.65" rx="1"/>
+          <rect x="87" y="61" width="5" height="5" fill="white" opacity="0.65" rx="1"/>
+          <rect x="79" y="72" width="5" height="5" fill="white" opacity="0.65" rx="1"/>
+          <rect x="87" y="72" width="5" height="5" fill="white" opacity="0.65" rx="1"/>
+          <!-- Centre tower (tall) -->
+          <rect x="38" y="22" width="34" height="78" fill="#0D4F7C" rx="3"/>
+          <!-- Tower roof accent -->
+          <rect x="38" y="22" width="34" height="7" fill="#0A3B5C" rx="3"/>
+          <!-- Windows centre -->
+          <rect x="43" y="32" width="7" height="7" fill="white" opacity="0.6" rx="1"/>
+          <rect x="54" y="32" width="7" height="7" fill="white" opacity="0.6" rx="1"/>
+          <rect x="43" y="44" width="7" height="7" fill="white" opacity="0.6" rx="1"/>
+          <rect x="54" y="44" width="7" height="7" fill="white" opacity="0.6" rx="1"/>
+          <rect x="43" y="56" width="7" height="7" fill="white" opacity="0.6" rx="1"/>
+          <rect x="54" y="56" width="7" height="7" fill="white" opacity="0.6" rx="1"/>
+          <rect x="43" y="68" width="7" height="7" fill="white" opacity="0.6" rx="1"/>
+          <rect x="54" y="68" width="7" height="7" fill="white" opacity="0.6" rx="1"/>
+          <!-- Trend line + arrow -->
+          <polyline points="13,96 28,84 45,87 62,74 79,60 94,44" stroke="#FCD34D" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <polygon points="98,40 90,47 97,53" fill="#FCD34D" transform="rotate(-10 94 47)"/>
+        </svg>
+      </div>
+      <h2 class="card-title">Corporate Finance</h2>
+      <p class="card-desc">SMEs and growth companies seeking equity, debt, or blended finance at the corporate level — readiness and bankability across 9 dimensions.</p>
+      <button class="start-btn">Begin Assessment &rarr;</button>
+    </div>
+
+  </div>
+
+  <!-- Exit -->
+  <div class="exit-wrap">
+    <button class="exit-btn" onclick="showExit()">Exit Assessment</button>
+  </div>
+
+</div>
+
+<!-- Exit overlay -->
+<div class="overlay" id="exit-overlay" onclick="closeOverlay(event)">
+  <div class="overlay-box">
+    <div class="overlay-icon">👋</div>
+    <div class="overlay-title">Assessment ended</div>
+    <div class="overlay-text">Thank you for using the Finance Assessment Navigator. You may now close this tab or window.</div>
+    <button class="overlay-close" onclick="document.getElementById('exit-overlay').classList.remove('show')">Stay on page</button>
+  </div>
+</div>
+
+<script>
+  function goTo(url) {
+    window.location.href = url;
+  }
+
+  function showExit() {
+    document.getElementById('exit-overlay').classList.add('show');
+    // Attempt to close the window after a short delay (works if opened via script)
+    setTimeout(() => {
+      try { window.close(); } catch(e) { /* browser blocked it — overlay stays visible */ }
+    }, 200);
+  }
+
+  function closeOverlay(e) {
+    if (e.target === document.getElementById('exit-overlay')) {
+      document.getElementById('exit-overlay').classList.remove('show');
+    }
+  }
+</script>
+</body>
+</html>
