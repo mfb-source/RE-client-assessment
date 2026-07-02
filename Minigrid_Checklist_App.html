@@ -655,7 +655,7 @@
         </select>
       </div>
       <div class="form-group">
-        <label>Installed Capacity (MWp)</label>
+        <label>Total Installed Capacity across Portfolio (MWp)</label>
         <input type="number" id="f-capacity" placeholder="e.g. 50">
       </div>
       <div class="form-group">
@@ -881,7 +881,7 @@ const PHASES = [
     id: 'p1', label: 'Phase 1: Site Identification / Concept',
     groups: [
       { heading: null, items: [
-        { id:'p1_1', desc:'Site location identified and secured', tags:['eng'] },
+        { id:'p1_1', desc:'Site locations identified and secured', tags:['eng'] },
         { id:'p1_2', desc:'Project development funding secured', tags:[] },
       ]}
     ]
@@ -890,11 +890,9 @@ const PHASES = [
     id: 'p2', label: 'Phase 2: Pre-Feasibility Stage',
     groups: [
       { heading: null, items: [
-        { id:'p2_1', desc:'Different technical options assessed for suitability (controller type, storage, backup generator, etc.)', tags:['eng'] },
-        { id:'p2_2', desc:'Cost/benefit analysis of each technical option completed', tags:['eng'] },
-        { id:'p2_3', desc:'Identification of all permitting needs and pre-conditions to issuance', tags:['legal'] },
-        { id:'p2_4', desc:'Suitable off-taker for power found and basic agreement reached', tags:['legal','fin'] },
-        { id:'p2_5', desc:'Detailed site insolation data collection started and site layout planning done', tags:['eng'] },
+        { id:'p2_1', desc:'Identification of all permitting needs and pre-conditions to issuance', tags:['legal'] },
+        { id:'p2_2', desc:'Concessions secured', tags:['legal'] },
+        { id:'p2_3', desc:'Detailed site insolation data collection started and site layout planning done', tags:['eng'] },
       ]}
     ]
   },
@@ -922,8 +920,8 @@ const PHASES = [
         { id:'p4_c4', desc:'Conditional land lease, purchase and expropriation contracts signed', tags:['legal'] },
         { id:'p4_c5', desc:'Detailed site insolation data and layout collected and finalised', tags:['eng'] },
         { id:'p4_c6', desc:'Site access, access road arrangements, access to transmission/distribution lines clarified', tags:['eng'] },
-        { id:'p4_c7', desc:'Off-take term sheet (PPA) negotiated', tags:['fin'] },
-        { id:'p4_c8', desc:'Inter-connection agreement and wheeling charges negotiated', tags:['legal'] },
+        { id:'p4_c7', desc:'Off-take term sheet (PPA) negotiated if applicable', tags:['fin'] },
+        { id:'p4_c8', desc:'Clarified termination charges or continued operations in case of Grid arrival', tags:['legal'] },
         { id:'p4_c9', desc:'RFP for EPC contract sent to potential candidates', tags:['eng'] },
         { id:'p4_c10', desc:'RFP for O&M contract sent to potential candidates', tags:['eng'] },
       ]},
