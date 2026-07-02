@@ -629,18 +629,20 @@
     <div class="form-grid">
       <div class="form-group">
         <label>Technology Type <span class="req">*</span></label>
-        <select id="f-technology">
+        <select id="f-technology" onchange="toggleTechOther(this.value)">
           <option value="">Select…</option>
-          <option>Utility-Scale PV (Fixed Tilt)</option>
-          <option>Utility-Scale PV (Single-Axis Tracker)</option>
-          <option>PV + Battery Storage (BESS)</option>
-          <option>PV + Diesel Hybrid</option>
-          <option>Wind</option>
-          <option>Wind + Storage</option>
-          <option>Concentrated Solar Power (CSP)</option>
+          <option>Solar PV only</option>
+          <option>Solar PV plus BESS</option>
+          <option>Solar PV plus BESS plus Diesel Backup</option>
           <option>Small Hydro</option>
-          <option>Other</option>
+          <option>Biomass</option>
+          <option>Biomass plus Solar PV</option>
+          <option value="Other">Other</option>
         </select>
+      </div>
+      <div class="form-group" id="f-technology-other-wrap" style="display:none;">
+        <label>Please specify technology</label>
+        <input type="text" id="f-technology-other" maxlength="40" placeholder="Describe technology (max 40 characters)">
       </div>
       <div class="form-group">
         <label>Grid Connection</label>
@@ -683,34 +685,48 @@
     <div class="card-title"><div class="icon">💰</div> Financial Overview</div>
     <div class="form-grid">
       <div class="form-group">
-        <label>Estimated CAPEX (USD million)</label>
-        <input type="number" id="f-capex" placeholder="e.g. 65">
+        <label>CAPEX per Connection (USD)</label>
+        <input type="number" id="f-capex" placeholder="e.g. 1200">
+      </div>
+      <div class="form-group">
+        <label>Total Estimated Project Costs (USD million)</label>
+        <input type="number" id="f-totalcost" placeholder="e.g. 8.5">
+      </div>
+      <div class="form-group">
+        <label>Agreed Tariff (USDc / kWh)</label>
+        <input type="number" id="f-agreed-tariff" min="0" step="0.1" placeholder="e.g. 45.0">
       </div>
       <div class="form-group">
         <label>Development Funding Required (USD million)</label>
-        <input type="number" id="f-devfunding" placeholder="e.g. 1.5 — budget to reach financial close">
+        <input type="number" id="f-devfunding" placeholder="e.g. 0.5 — budget to reach financial close">
       </div>
-      <div class="form-group">
-        <label>Debt (%) <span style="font-weight:400;text-transform:none;letter-spacing:0;">— equity auto-calculates to 100%</span></label>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="flex:1;position:relative;">
-            <input type="number" id="f-debt-pct" min="0" max="100" placeholder="e.g. 70"
-              oninput="syncEquity(this.value)" style="padding-right:28px;">
+      <div class="form-group full">
+        <label>Financing Structure <span style="font-weight:400;text-transform:none;letter-spacing:0;">— Debt + Equity + Grant must equal 100%</span></label>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:80px;position:relative;">
+            <input type="number" id="f-debt-pct" min="0" max="100" placeholder="e.g. 50"
+              oninput="syncFinancing('debt')" style="padding-right:28px;">
             <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400);pointer-events:none;">%</span>
           </div>
           <span style="font-size:13px;color:var(--gray-600);font-weight:600;white-space:nowrap;">Debt</span>
-          <span style="font-size:18px;color:var(--gray-400);">:</span>
-          <div style="flex:1;position:relative;">
-            <input type="number" id="f-equity-pct" min="0" max="100" placeholder="30" readonly
-              style="background:var(--gray-50);color:var(--gray-600);padding-right:28px;">
+          <div style="flex:1;min-width:80px;position:relative;">
+            <input type="number" id="f-equity-pct" min="0" max="100" placeholder="e.g. 30"
+              oninput="syncFinancing('equity')" style="padding-right:28px;">
             <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400);pointer-events:none;">%</span>
           </div>
           <span style="font-size:13px;color:var(--gray-600);font-weight:600;white-space:nowrap;">Equity</span>
+          <div style="flex:1;min-width:80px;position:relative;">
+            <input type="number" id="f-grant-pct" min="0" max="100" placeholder="e.g. 20" readonly
+              style="background:var(--gray-50);color:var(--gray-600);padding-right:28px;">
+            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400);pointer-events:none;">%</span>
+          </div>
+          <span style="font-size:13px;color:var(--gray-600);font-weight:600;white-space:nowrap;">Grant</span>
+          <span id="financing-total-msg" style="font-size:12px;color:var(--gray-500);white-space:nowrap;"></span>
         </div>
       </div>
       <div class="form-group">
         <label>Target Debt Tenor (years)</label>
-        <input type="number" id="f-tenor" placeholder="e.g. 18">
+        <input type="number" id="f-tenor" placeholder="e.g. 10">
       </div>
       <div class="form-group">
         <label>Currency Denomination</label>
@@ -1098,14 +1114,26 @@ function updateAmount(id, val) {
   state[id].amount = val;
 }
 
-function syncEquity(debtVal) {
-  const debt = parseFloat(debtVal);
-  const eq = document.getElementById('f-equity-pct');
-  if (!isNaN(debt) && debt >= 0 && debt <= 100) {
-    eq.value = (100 - debt).toFixed(1).replace('.0','');
+function syncFinancing(changed) {
+  const debt   = parseFloat(document.getElementById('f-debt-pct').value)   || 0;
+  const equity = parseFloat(document.getElementById('f-equity-pct').value) || 0;
+  const grant  = document.getElementById('f-grant-pct');
+  const msg    = document.getElementById('financing-total-msg');
+  const remainder = 100 - debt - equity;
+  if (remainder >= 0) {
+    grant.value = remainder === 0 ? '0' : remainder.toFixed(1).replace('.0','');
+    msg.textContent = remainder === 0 ? '✓ 100%' : `Grant auto-set to ${grant.value}%`;
+    msg.style.color = remainder === 0 ? 'var(--green,#059669)' : 'var(--gray-500)';
   } else {
-    eq.value = '';
+    grant.value = '';
+    msg.textContent = `⚠ Debt + Equity exceed 100%`;
+    msg.style.color = '#dc2626';
   }
+}
+
+function toggleTechOther(val) {
+  document.getElementById('f-technology-other-wrap').style.display = val === 'Other' ? '' : 'none';
+  if (val !== 'Other') document.getElementById('f-technology-other').value = '';
 }
 
 function togglePhase(id) {
@@ -1186,9 +1214,13 @@ function renderSummary() {
 // EXPORT — EXCEL
 // ─────────────────────────────────────────────────────────────
 function getProjectDetails() {
-  const debtPct  = document.getElementById('f-debt-pct').value;
+  const debtPct   = document.getElementById('f-debt-pct').value;
   const equityPct = document.getElementById('f-equity-pct').value;
-  const debtEquityStr = (debtPct && equityPct) ? `${debtPct}% Debt : ${equityPct}% Equity` : (debtPct ? `${debtPct}% Debt` : '');
+  const grantPct  = document.getElementById('f-grant-pct').value;
+  const finStr = [debtPct && `${debtPct}% Debt`, equityPct && `${equityPct}% Equity`, grantPct && `${grantPct}% Grant`].filter(Boolean).join(' : ');
+  const techVal = document.getElementById('f-technology').value;
+  const techOther = document.getElementById('f-technology-other').value;
+  const technologyStr = techVal === 'Other' ? `Other — ${techOther}` : techVal;
   return {
     'Company Name':                   document.getElementById('f-company').value,
     'Project Name':                   document.getElementById('f-project').value,
@@ -1199,22 +1231,24 @@ function getProjectDetails() {
     'Country':                        document.getElementById('f-country').value,
     'Region / Province':              document.getElementById('f-region').value,
     'Distance to Grid & Connection Type': document.getElementById('f-griddistance').value,
-    'Technology Type':                document.getElementById('f-technology').value,
-    'Grid Connection':                document.getElementById('f-grid').value,
-    'Installed Capacity (MWp)':       document.getElementById('f-capacity').value,
-    'Storage Capacity (MWh)':         document.getElementById('f-storage').value,
-    'Annual Generation (GWh/yr)':     document.getElementById('f-generation').value,
-    'Expected COD':                   document.getElementById('f-cod').value,
-    'Off-Taker(s)':                   document.getElementById('f-offtaker').value,
-    'Tariff / PPA Structure':         document.getElementById('f-tariff').value,
-    'Estimated CAPEX (USD m)':                 document.getElementById('f-capex').value,
-    'Development Funding Required (USD m)':    document.getElementById('f-devfunding').value,
-    'Debt (%)':                                debtPct,
-    'Equity (%)':                              equityPct,
-    'Debt:Equity Ratio':                       debtEquityStr,
-    'Target Debt Tenor (yrs)':        document.getElementById('f-tenor').value,
-    'Currency':                       document.getElementById('f-currency').value,
-    'Financing Notes':                document.getElementById('f-financingnotes').value,
+    'Technology Type':                          technologyStr,
+    'Grid Connection':                          document.getElementById('f-grid').value,
+    'Installed Capacity (MWp)':                 document.getElementById('f-capacity').value,
+    'Storage Capacity (MWh)':                   document.getElementById('f-storage').value,
+    'Annual Generation (GWh/yr)':               document.getElementById('f-generation').value,
+    'Expected COD':                             document.getElementById('f-cod').value,
+    'Off-Taker(s)':                             document.getElementById('f-offtaker').value,
+    'Agreed Tariff (USDc / kWh)':              document.getElementById('f-agreed-tariff').value,
+    'CAPEX per Connection (USD)':               document.getElementById('f-capex').value,
+    'Total Estimated Project Costs (USD m)':    document.getElementById('f-totalcost').value,
+    'Development Funding Required (USD m)':     document.getElementById('f-devfunding').value,
+    'Debt (%)':                                 debtPct,
+    'Equity (%)':                               equityPct,
+    'Grant (%)':                                grantPct,
+    'Financing Structure':                      finStr,
+    'Target Debt Tenor (yrs)':                  document.getElementById('f-tenor').value,
+    'Currency':                                 document.getElementById('f-currency').value,
+    'Financing Notes':                          document.getElementById('f-financingnotes').value,
   };
 }
 
