@@ -533,7 +533,7 @@
   </div>
 
   <div class="card">
-    <div class="card-title"><div class="icon">📍</div> Project Location</div>
+    <div class="card-title"><div class="icon">📍</div> Project Locations</div>
     <div class="form-grid">
       <div class="form-group">
         <label>Country <span class="req">*</span></label>
@@ -597,23 +597,29 @@
       </div>
       <div class="form-group">
         <label>Region / Province</label>
-        <input type="text" id="f-region" placeholder="e.g. Limpopo">
-      </div>
-      <div class="form-group">
-        <label>GPS Coordinates</label>
-        <input type="text" id="f-gps" placeholder="Lat, Long — e.g. -23.9°, 29.4°">
-      </div>
-      <div class="form-group">
-        <label>Site Area (ha)</label>
-        <input type="number" id="f-area" placeholder="e.g. 250">
-      </div>
-      <div class="form-group full">
-        <label>Site Description</label>
-        <textarea id="f-sitedesc" placeholder="Brief description of site access, land ownership, proximity to grid infrastructure…"></textarea>
+        <input type="text" id="f-region" placeholder="e.g. Northern Region">
       </div>
       <div class="form-group full">
         <label>Distance to Grid Connection &amp; Type of Connection</label>
-        <textarea id="f-griddistance" placeholder="e.g. 4.2 km to 132kV transmission line (Eskom Lephalale substation); wheeling via national grid; step-up transformer required on-site…"></textarea>
+        <textarea id="f-griddistance" placeholder="e.g. Off-grid; nearest 33kV line approx. 45 km away; standalone minigrid with no grid interconnection planned…"></textarea>
+      </div>
+    </div>
+
+    <!-- Concession Areas Table -->
+    <div style="margin-top:20px;">
+      <label style="font-weight:600;font-size:13px;color:var(--gray-700);display:block;margin-bottom:8px;">Concession Areas</label>
+      <div style="overflow-x:auto;">
+        <table id="concession-table" style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr>
+              <th style="background:var(--blue-dk,#0D4F7C);color:#fff;padding:8px 10px;text-align:left;font-weight:600;border:1px solid #b0c4de;width:40%;">Concession Area</th>
+              <th style="background:var(--blue-dk,#0D4F7C);color:#fff;padding:8px 10px;text-align:center;font-weight:600;border:1px solid #b0c4de;width:30%;">Estimated Connections</th>
+              <th style="background:var(--blue-dk,#0D4F7C);color:#fff;padding:8px 10px;text-align:center;font-weight:600;border:1px solid #b0c4de;width:30%;">Already Connected</th>
+            </tr>
+          </thead>
+          <tbody id="concession-tbody">
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -1192,9 +1198,6 @@ function getProjectDetails() {
     'Report Version':                 document.getElementById('f-version').value,
     'Country':                        document.getElementById('f-country').value,
     'Region / Province':              document.getElementById('f-region').value,
-    'GPS Coordinates':                document.getElementById('f-gps').value,
-    'Site Area (ha)':                 document.getElementById('f-area').value,
-    'Site Description':               document.getElementById('f-sitedesc').value,
     'Distance to Grid & Connection Type': document.getElementById('f-griddistance').value,
     'Technology Type':                document.getElementById('f-technology').value,
     'Grid Connection':                document.getElementById('f-grid').value,
@@ -1364,7 +1367,35 @@ async function exportXLSX() {
     });
   });
 
-  // ── SHEET 3: Legend ─────────────────────────────────────────
+  // ── SHEET 3: Concession Areas ───────────────────────────────
+  const ws3c = wb.addWorksheet('Concession Areas');
+  ws3c.columns = [{width:44},{width:26},{width:26}];
+
+  ws3c.mergeCells('A1:C1');
+  sty(ws3c.getCell('A1'), {bg:BLUE_DK, fg:WHITE, bold:true, size:12, halign:'center', bdc:BLUE_DK});
+  ws3c.getCell('A1').value = 'CONCESSION AREAS';
+  ws3c.getRow(1).height = 28;
+
+  ['Concession Area','Estimated Connections','Already Connected'].forEach((h, i) => {
+    const addr = `${['A','B','C'][i]}2`;
+    sty(ws3c.getCell(addr), {bg:BLUE_MD, fg:WHITE, bold:true, size:10, halign:'center', bdc:BLUE_MD});
+    ws3c.getCell(addr).value = h;
+  });
+  ws3c.getRow(2).height = 22;
+
+  getConcessionRows().forEach((row, idx) => {
+    const rn = idx + 3;
+    const bg = idx % 2 === 0 ? WHITE : BLUE_XLT;
+    sty(ws3c.getCell(`A${rn}`), {bg, size:10, indent:1});
+    sty(ws3c.getCell(`B${rn}`), {bg, size:10, halign:'center'});
+    sty(ws3c.getCell(`C${rn}`), {bg, size:10, halign:'center'});
+    ws3c.getCell(`A${rn}`).value = row.area      || '';
+    ws3c.getCell(`B${rn}`).value = row.estimated ? Number(row.estimated) : '';
+    ws3c.getCell(`C${rn}`).value = row.connected ? Number(row.connected) : '';
+    ws3c.getRow(rn).height = 18;
+  });
+
+  // ── SHEET 4: Legend ─────────────────────────────────────────
   const ws3 = wb.addWorksheet('Legend');
   ws3.columns = [{width:22},{width:38}];
   let ln = 1;
@@ -1474,9 +1505,41 @@ function showToast(msg) {
 // ─────────────────────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────────────────────
+function buildConcessionTable() {
+  const tbody = document.getElementById('concession-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  for (let i = 0; i < 10; i++) {
+    const bg = i % 2 === 0 ? '#ffffff' : '#f0f7ff';
+    tbody.innerHTML += `
+      <tr style="background:${bg}">
+        <td style="border:1px solid #d1d5db;padding:4px 6px;">
+          <input type="text" id="ca-name-${i}" placeholder="e.g. Village / District name"
+            style="width:100%;border:none;background:transparent;font-size:13px;outline:none;color:#1f2937;">
+        </td>
+        <td style="border:1px solid #d1d5db;padding:4px 6px;text-align:center;">
+          <input type="number" id="ca-est-${i}" placeholder="0" min="0"
+            style="width:80px;border:none;background:transparent;font-size:13px;outline:none;color:#1f2937;text-align:center;">
+        </td>
+        <td style="border:1px solid #d1d5db;padding:4px 6px;text-align:center;">
+          <input type="number" id="ca-conn-${i}" placeholder="0" min="0"
+            style="width:80px;border:none;background:transparent;font-size:13px;outline:none;color:#1f2937;text-align:center;">
+        </td>
+      </tr>`;
+  }
+}
+
+function getConcessionRows() {
+  return Array.from({length: 10}, (_, i) => ({
+    area:      (document.getElementById(`ca-name-${i}`)?.value  || '').trim(),
+    estimated: (document.getElementById(`ca-est-${i}`)?.value   || '').trim(),
+    connected: (document.getElementById(`ca-conn-${i}`)?.value  || '').trim(),
+  }));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  // Default date to today
   document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+  buildConcessionTable();
   renderChecklist();
 });
 </script>
