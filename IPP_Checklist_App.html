@@ -1423,7 +1423,12 @@ async function exportXLSX() {
   const url    = URL.createObjectURL(blob);
   const a      = document.createElement('a');
   a.href       = url;
-  const fname  = (document.getElementById('f-project').value||'IPP_Checklist').replace(/\s+/g,'_')+'_Status.xlsx';
+  const companyRaw = document.getElementById('f-company').value || 'Company';
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2,'0');
+  const mm = String(today.getMonth()+1).padStart(2,'0');
+  const yyyy = today.getFullYear();
+  const fname = companyRaw.replace(/\s+/g,'_') + `_assessment_${dd}.${mm}.${yyyy}.xlsx`;
   a.download   = fname;
   document.body.appendChild(a);
   a.click();
