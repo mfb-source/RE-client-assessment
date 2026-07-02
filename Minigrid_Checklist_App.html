@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minigrid Project Status Checklist — UNDP</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+<style>
+  :root {
+    --blue:    #1a6fa8;
+    --blue-dk: #0d4f7c;
+    --blue-lt: #e8f3fa;
+    --green:   #2e8b57;
+    --amber:   #d97706;
+    --red:     #c0392b;
+    --gray-50: #f9fafb;
+    --gray-100:#f3f4f6;
+    --gray-200:#e5e7eb;
+    --gray-400:#9ca3af;
+    --gray-600:#4b5563;
+    --gray-800:#1f2937;
+    --radius:  8px;
+    --shadow:  0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    color: var(--gray-800);
+    background: var(--gray-100);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ──────────────────────────────── */
+  header {
+    background: linear-gradient(135deg, var(--blue-dk) 0%, var(--blue) 100%);
+    color: #fff;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  header .logo-icon {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,.18);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  header h1 { font-size: 17px; font-weight: 600; letter-spacing: -.2px; }
+  header p  { font-size: 11px; opacity: .75; margin-top: 1px; }
+  header .header-actions { display: flex; gap: 10px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: none; transition: all .15s;
+  }
+  .btn-primary   { background: #fff; color: var(--blue-dk); }
+  .btn-primary:hover { background: #e8f0fe; }
+  .btn-outline   { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.45); }
+  .btn-outline:hover { background: rgba(255,255,255,.12); }
+  .btn-green     { background: var(--green); color: #fff; }
+  .btn-green:hover { background: #246b44; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+  /* ── PROGRESS BAR ────────────────────────── */
+  .progress-bar-wrap {
+    background: var(--blue-dk);
+    padding: 0 32px 14px;
+  }
+  .nav-home-row {
+    display: flex; align-items: center;
+    padding: 8px 0 4px;
+  }
+  .nav-home-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    color: rgba(255,255,255,0.55); font-size: 11px; font-weight: 600;
+    cursor: pointer; padding: 4px 0; border: none; background: none;
+    font-family: inherit; letter-spacing: 0.2px;
+    transition: color 0.15s;
+  }
+  .nav-home-btn:hover { color: rgba(255,255,255,0.9); }
+  .progress-steps {
+    display: flex;
+    gap: 0;
+  }
+  .progress-step {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    padding: 6px 4px 0;
+    position: relative;
+    color: rgba(255,255,255,.5);
+    font-size: 11px;
+    font-weight: 500;
+    transition: color .2s;
+  }
+  .progress-step::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,.2);
+    border-radius: 4px;
+    margin-bottom: 5px;
+    transition: background .2s;
+  }
+  .progress-step.active { color: #fff; }
+  .progress-step.active::before { background: #fff; }
+  .progress-step.done { color: rgba(255,255,255,.8); }
+  .progress-step.done::before { background: rgba(255,255,255,.6); }
+
+  /* ── LAYOUT ──────────────────────────────── */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 20px;
+  }
+
+  /* ── PAGES ───────────────────────────────── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── CARDS ───────────────────────────────── */
+  .card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px 28px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 15px; font-weight: 600; color: var(--blue-dk);
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1.5px solid var(--gray-200);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--blue-lt);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+
+  /* ── FORM GRID ───────────────────────────── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .form-grid .full { grid-column: 1 / -1; }
+  .form-group label {
+    display: block;
+    font-size: 12px; font-weight: 600;
+    color: var(--gray-600);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+  .form-group label span.req { color: var(--red); margin-left: 2px; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--gray-800);
+    background: #fff;
+    transition: border-color .15s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(26,111,168,.1);
+  }
+  .form-group textarea { resize: vertical; min-height: 72px; }
+
+  /* ── CHECKLIST ───────────────────────────── */
+  .phase-block {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .phase-header {
+    background: linear-gradient(90deg, var(--blue-dk) 0%, var(--blue) 100%);
+    color: #fff;
+    padding: 13px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .phase-header h3 { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .phase-header .phase-badge {
+    background: rgba(255,255,255,.18);
+    padding: 2px 9px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .phase-header .phase-progress-text { font-size: 11px; opacity: .8; }
+  .phase-collapse-icon { font-size: 12px; transition: transform .2s; }
+  .phase-block.collapsed .phase-collapse-icon { transform: rotate(-90deg); }
+
+  .phase-body { padding: 0; }
+  .phase-block.collapsed .phase-body { display: none; }
+
+  /* Sub-group headings inside a phase */
+  .subgroup-heading {
+    background: var(--gray-50);
+    padding: 8px 20px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--blue);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 1px solid var(--gray-200);
+    border-top: 1px solid var(--gray-200);
+  }
+
+  /* Individual checklist row */
+  .checklist-row {
+    display: grid;
+    grid-template-columns: 1fr 110px 90px 80px 1fr;
+    align-items: start;
+    padding: 11px 20px;
+    border-bottom: 1px solid var(--gray-100);
+    gap: 12px;
+    transition: background .1s;
+  }
+  .checklist-row:last-child { border-bottom: none; }
+  .checklist-row:hover { background: var(--gray-50); }
+
+  .item-desc {
+    font-size: 13px; color: var(--gray-800);
+    line-height: 1.45;
+    padding-top: 2px;
+  }
+  .item-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+  .tag {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 7px; border-radius: 10px;
+    letter-spacing: .3px;
+  }
+  .tag-legal { background: #fef3c7; color: #92400e; }
+  .tag-fin   { background: #d1fae5; color: #065f46; }
+  .tag-eng   { background: #dbeafe; color: #1e40af; }
+
+  .status-select {
+    padding: 6px 8px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 6px;
+    font-size: 12px;
+    width: 100%;
+    cursor: pointer;
+    background: #fff;
+    transition: border-color .15s;
+  }
+  .status-select:focus { outline: none; border-color: var(--blue); }
+  .status-select.s0 { border-color: #d1d5db; color: var(--gray-600); }
+  .status-select.s1 { border-color: #f59e0b; color: #92400e; background: #fffbeb; }
+  .status-select.s2 { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+  .status-select.s3 { border-color: #8b5cf6; color: #5b21b6; background: #f5f3ff; }
+  .status-select.s4 { border-color: var(--green); color: var(--green); background: #f0fdf4; }
+
+  .weeks-input {
+    padding: 6px 8px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 6px;
+    font-size: 12px;
+    width: 100%;
+    text-align: center;
+  }
+  .weeks-input:focus { outline: none; border-color: var(--blue); }
+
+  .completion-wrap {
+    display: flex; align-items: center; gap: 6px;
+    padding-top: 4px;
+  }
+  .completion-wrap input[type=checkbox] {
+    width: 16px; height: 16px; cursor: pointer; accent-color: var(--green);
+  }
+
+  .note-input {
+    width: 100%;
+    padding: 6px 9px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 6px;
+    font-size: 12px;
+    resize: none;
+    min-height: 36px;
+    font-family: inherit;
+  }
+  .note-input:focus { outline: none; border-color: var(--blue); }
+
+  /* column headers */
+  .checklist-header {
+    display: grid;
+    grid-template-columns: 1fr 110px 90px 80px 1fr;
+    gap: 12px;
+    padding: 8px 20px;
+    background: var(--gray-50);
+    border-bottom: 1.5px solid var(--gray-200);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--gray-400);
+  }
+
+  /* Phase milestone-only rows */
+  .milestone-row {
+    padding: 16px 20px;
+    color: var(--gray-600);
+    font-style: italic;
+    font-size: 13px;
+    background: var(--gray-50);
+  }
+
+  /* ── LEGEND ──────────────────────────────── */
+  .legend-grid {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+  .legend-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .dot-0 { background: #d1d5db; }
+  .dot-1 { background: #f59e0b; }
+  .dot-2 { background: #3b82f6; }
+  .dot-3 { background: #8b5cf6; }
+  .dot-4 { background: var(--green); }
+
+  /* ── SUMMARY PAGE ────────────────────────── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    text-align: center;
+  }
+  .stat-card .stat-num {
+    font-size: 28px; font-weight: 700; color: var(--blue-dk);
+    line-height: 1;
+  }
+  .stat-card .stat-label {
+    font-size: 11px; color: var(--gray-400);
+    margin-top: 4px; font-weight: 500; text-transform: uppercase;
+  }
+  .stat-card.green .stat-num { color: var(--green); }
+  .stat-card.amber .stat-num { color: var(--amber); }
+
+  .phase-summary-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .phase-summary-row:last-child { border-bottom: none; }
+  .phase-label { width: 220px; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+  .mini-progress {
+    flex: 1;
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .mini-progress-fill {
+    height: 100%;
+    background: var(--blue);
+    border-radius: 4px;
+    transition: width .4s ease;
+  }
+  .mini-pct { width: 36px; text-align: right; font-size: 12px; font-weight: 600; color: var(--blue-dk); }
+
+  /* ── EXPORT PAGE ─────────────────────────── */
+  .export-options {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  }
+  .export-card {
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 22px;
+    text-align: center;
+    transition: border-color .2s;
+  }
+  .export-card:hover { border-color: var(--blue); }
+  .export-card .export-icon { font-size: 36px; margin-bottom: 10px; }
+  .export-card h4 { font-size: 15px; margin-bottom: 6px; }
+  .export-card p { font-size: 12px; color: var(--gray-600); margin-bottom: 16px; line-height: 1.5; }
+
+  /* ── NAV BUTTONS ─────────────────────────── */
+  .page-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+  }
+  .btn-nav {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 22px;
+    border-radius: 7px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none;
+    transition: all .15s;
+  }
+  .btn-nav-back { background: var(--gray-200); color: var(--gray-800); }
+  .btn-nav-back:hover { background: var(--gray-400); color: #fff; }
+  .btn-nav-next { background: var(--blue); color: #fff; }
+  .btn-nav-next:hover { background: var(--blue-dk); }
+
+  /* ── RESPONSIVE ──────────────────────────── */
+  @media (max-width: 760px) {
+    .checklist-row { grid-template-columns: 1fr; }
+    .checklist-header { display: none; }
+    .form-grid { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: repeat(2,1fr); }
+    .export-options { grid-template-columns: 1fr; }
+  }
+
+  .toast {
+    position: fixed; bottom: 28px; right: 28px;
+    background: var(--gray-800); color: #fff;
+    padding: 12px 20px; border-radius: 8px;
+    font-size: 13px; font-weight: 500;
+    box-shadow: var(--shadow-md);
+    opacity: 0; transform: translateY(12px);
+    transition: all .3s; pointer-events: none;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <h1>Minigrid Project Status Checklist</h1>
+      <p>Independent Power Producer — Development Readiness Assessment</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-outline" onclick="goTo(3)">📊 Summary</button>
+    <button class="btn btn-primary" onclick="goTo(4)">⬇ Export</button>
+  </div>
+</header>
+
+<!-- PROGRESS TABS -->
+<div class="progress-bar-wrap">
+  <div class="nav-home-row">
+    <button class="nav-home-btn" onclick="window.location.href='Assessment_Intro.html'">&#8592; Home</button>
+  </div>
+  <div class="progress-steps">
+    <div class="progress-step active" id="tab-1" onclick="goTo(1)">① Project Info</div>
+    <div class="progress-step" id="tab-2" onclick="goTo(2)">② Checklist</div>
+    <div class="progress-step" id="tab-3" onclick="goTo(3)">③ Summary</div>
+    <div class="progress-step" id="tab-4" onclick="goTo(4)">④ Export</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE 1 — PROJECT DETAILS
+═════════════════════════════════════════════ -->
+<div class="page active" id="page-1">
+<div class="container">
+
+  <div class="card">
+    <div class="card-title"><div class="icon">🏢</div> Company & Developer Information</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Company Name <span class="req">*</span></label>
+        <input type="text" id="f-company" placeholder="e.g. Acme Energy Ltd.">
+      </div>
+      <div class="form-group">
+        <label>Project Name <span class="req">*</span></label>
+        <input type="text" id="f-project" placeholder="e.g. Limpopo Solar IPP">
+      </div>
+      <div class="form-group">
+        <label>Developer / Sponsor</label>
+        <input type="text" id="f-developer" placeholder="Lead developer entity">
+      </div>
+      <div class="form-group">
+        <label>Prepared By</label>
+        <input type="text" id="f-preparedby" placeholder="Name / team">
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="form-group">
+        <label>Report Version</label>
+        <input type="text" id="f-version" placeholder="e.g. v1.0">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon">📍</div> Project Location</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Country <span class="req">*</span></label>
+        <select id="f-country">
+          <option value="">Select country…</option>
+          <option>Algeria</option>
+          <option>Angola</option>
+          <option>Benin</option>
+          <option>Botswana</option>
+          <option>Burkina Faso</option>
+          <option>Burundi</option>
+          <option>Cabo Verde</option>
+          <option>Cameroon</option>
+          <option>Central African Republic</option>
+          <option>Chad</option>
+          <option>Comoros</option>
+          <option>Côte d'Ivoire</option>
+          <option>Democratic Republic of the Congo</option>
+          <option>Djibouti</option>
+          <option>Egypt</option>
+          <option>Equatorial Guinea</option>
+          <option>Eritrea</option>
+          <option>Eswatini</option>
+          <option>Ethiopia</option>
+          <option>Gabon</option>
+          <option>Gambia</option>
+          <option>Ghana</option>
+          <option>Guinea</option>
+          <option>Guinea-Bissau</option>
+          <option>Kenya</option>
+          <option>Lesotho</option>
+          <option>Liberia</option>
+          <option>Libya</option>
+          <option>Madagascar</option>
+          <option>Malawi</option>
+          <option>Mali</option>
+          <option>Mauritania</option>
+          <option>Mauritius</option>
+          <option>Morocco</option>
+          <option>Mozambique</option>
+          <option>Namibia</option>
+          <option>Niger</option>
+          <option>Nigeria</option>
+          <option>Republic of the Congo</option>
+          <option>Rwanda</option>
+          <option>São Tomé and Príncipe</option>
+          <option>Senegal</option>
+          <option>Seychelles</option>
+          <option>Sierra Leone</option>
+          <option>Somalia</option>
+          <option>South Africa</option>
+          <option>South Sudan</option>
+          <option>Sudan</option>
+          <option>Tanzania</option>
+          <option>Togo</option>
+          <option>Tunisia</option>
+          <option>Uganda</option>
+          <option>Zambia</option>
+          <option>Zimbabwe</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Region / Province</label>
+        <input type="text" id="f-region" placeholder="e.g. Limpopo">
+      </div>
+      <div class="form-group">
+        <label>GPS Coordinates</label>
+        <input type="text" id="f-gps" placeholder="Lat, Long — e.g. -23.9°, 29.4°">
+      </div>
+      <div class="form-group">
+        <label>Site Area (ha)</label>
+        <input type="number" id="f-area" placeholder="e.g. 250">
+      </div>
+      <div class="form-group full">
+        <label>Site Description</label>
+        <textarea id="f-sitedesc" placeholder="Brief description of site access, land ownership, proximity to grid infrastructure…"></textarea>
+      </div>
+      <div class="form-group full">
+        <label>Distance to Grid Connection &amp; Type of Connection</label>
+        <textarea id="f-griddistance" placeholder="e.g. 4.2 km to 132kV transmission line (Eskom Lephalale substation); wheeling via national grid; step-up transformer required on-site…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon">⚙️</div> Technical Parameters</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Technology Type <span class="req">*</span></label>
+        <select id="f-technology">
+          <option value="">Select…</option>
+          <option>Utility-Scale PV (Fixed Tilt)</option>
+          <option>Utility-Scale PV (Single-Axis Tracker)</option>
+          <option>PV + Battery Storage (BESS)</option>
+          <option>PV + Diesel Hybrid</option>
+          <option>Wind</option>
+          <option>Wind + Storage</option>
+          <option>Concentrated Solar Power (CSP)</option>
+          <option>Small Hydro</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Grid Connection</label>
+        <select id="f-grid">
+          <option value="">Select…</option>
+          <option>On-Grid (National)</option>
+          <option>On-Grid (Mini-Grid)</option>
+          <option>Off-Grid / Isolated</option>
+          <option>Hybrid On/Off-Grid</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Installed Capacity (MWp)</label>
+        <input type="number" id="f-capacity" placeholder="e.g. 50">
+      </div>
+      <div class="form-group">
+        <label>Storage Capacity (MWh)</label>
+        <input type="number" id="f-storage" placeholder="e.g. 100 — if applicable">
+      </div>
+      <div class="form-group">
+        <label>Annual Generation Estimate (GWh/yr)</label>
+        <input type="number" id="f-generation" placeholder="e.g. 85">
+      </div>
+      <div class="form-group">
+        <label>Expected COD (Commercial Operation)</label>
+        <input type="text" id="f-cod" placeholder="e.g. Q3 2027">
+      </div>
+      <div class="form-group">
+        <label>Off-Taker(s)</label>
+        <input type="text" id="f-offtaker" placeholder="e.g. National utility + C&amp;I customer">
+      </div>
+      <div class="form-group">
+        <label>Tariff / PPA Structure</label>
+        <input type="text" id="f-tariff" placeholder="e.g. 20-yr fixed-price PPA, USD-denominated">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon">💰</div> Financial Overview</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Estimated CAPEX (USD million)</label>
+        <input type="number" id="f-capex" placeholder="e.g. 65">
+      </div>
+      <div class="form-group">
+        <label>Development Funding Required (USD million)</label>
+        <input type="number" id="f-devfunding" placeholder="e.g. 1.5 — budget to reach financial close">
+      </div>
+      <div class="form-group">
+        <label>Debt (%) <span style="font-weight:400;text-transform:none;letter-spacing:0;">— equity auto-calculates to 100%</span></label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="flex:1;position:relative;">
+            <input type="number" id="f-debt-pct" min="0" max="100" placeholder="e.g. 70"
+              oninput="syncEquity(this.value)" style="padding-right:28px;">
+            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400);pointer-events:none;">%</span>
+          </div>
+          <span style="font-size:13px;color:var(--gray-600);font-weight:600;white-space:nowrap;">Debt</span>
+          <span style="font-size:18px;color:var(--gray-400);">:</span>
+          <div style="flex:1;position:relative;">
+            <input type="number" id="f-equity-pct" min="0" max="100" placeholder="30" readonly
+              style="background:var(--gray-50);color:var(--gray-600);padding-right:28px;">
+            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--gray-400);pointer-events:none;">%</span>
+          </div>
+          <span style="font-size:13px;color:var(--gray-600);font-weight:600;white-space:nowrap;">Equity</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Target Debt Tenor (years)</label>
+        <input type="number" id="f-tenor" placeholder="e.g. 18">
+      </div>
+      <div class="form-group">
+        <label>Currency Denomination</label>
+        <select id="f-currency">
+          <option value="">Select…</option>
+          <option>USD</option>
+          <option>EUR</option>
+          <option>Local Currency</option>
+          <option>Blended (hard + local)</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Financing Notes</label>
+        <textarea id="f-financingnotes" placeholder="DFI involvement, blended finance instruments, grant support…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <div></div>
+    <button class="btn-nav btn-nav-next" onclick="goTo(2)">Go to Checklist →</button>
+  </div>
+
+</div>
+</div><!-- /page-1 -->
+
+
+<!-- ════════════════════════════════════════════
+     PAGE 2 — CHECKLIST
+═════════════════════════════════════════════ -->
+<div class="page" id="page-2">
+<div class="container">
+
+  <!-- Legend -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title"><div class="icon">📖</div> Legend</div>
+    <div class="legend-grid">
+      <div class="legend-item"><div class="legend-dot dot-0"></div> 0 — Not started</div>
+      <div class="legend-item"><div class="legend-dot dot-1"></div> 1 — Process started</div>
+      <div class="legend-item"><div class="legend-dot dot-2"></div> 2 — Made some headway</div>
+      <div class="legend-item"><div class="legend-dot dot-3"></div> 3 — Almost done</div>
+      <div class="legend-item"><div class="legend-dot dot-4"></div> 4 — Completed</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span class="tag tag-legal">Legal</span> <span style="font-size:12px;color:var(--gray-600);align-self:center;">= Legal / regulatory item</span>
+      <span class="tag tag-fin" style="margin-left:12px;">Fin.</span> <span style="font-size:12px;color:var(--gray-600);align-self:center;">= Financial / commercial item</span>
+      <span class="tag tag-eng" style="margin-left:12px;">Eng.</span> <span style="font-size:12px;color:var(--gray-600);align-self:center;">= Engineering / technical item</span>
+    </div>
+  </div>
+
+  <!-- Phases rendered by JS -->
+  <div id="phases-container"></div>
+
+  <div class="page-nav">
+    <button class="btn-nav btn-nav-back" onclick="goTo(1)">← Project Details</button>
+    <button class="btn-nav btn-nav-next" onclick="goTo(3)">View Summary →</button>
+  </div>
+
+</div>
+</div><!-- /page-2 -->
+
+
+<!-- ════════════════════════════════════════════
+     PAGE 3 — SUMMARY
+═════════════════════════════════════════════ -->
+<div class="page" id="page-3">
+<div class="container">
+
+  <div class="summary-grid" id="summary-stats"></div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon">📊</div> Progress by Phase</div>
+    <div id="phase-summary-rows"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon">⚠️</div> Items Not Yet Started</div>
+    <div id="not-started-list" style="font-size:13px;color:var(--gray-600);line-height:1.9;"></div>
+  </div>
+
+  <div class="page-nav">
+    <button class="btn-nav btn-nav-back" onclick="goTo(2)">← Back to Checklist</button>
+    <button class="btn-nav btn-nav-next" onclick="goTo(4)">Export →</button>
+  </div>
+
+</div>
+</div><!-- /page-3 -->
+
+
+<!-- ════════════════════════════════════════════
+     PAGE 4 — EXPORT
+═════════════════════════════════════════════ -->
+<div class="page" id="page-4">
+<div class="container">
+
+  <div class="card">
+    <div class="card-title"><div class="icon">⬇️</div> Export Options</div>
+    <p style="font-size:13px;color:var(--gray-600);margin-bottom:20px;">
+      Download your completed checklist as an Excel workbook (.xlsx). You can then upload it directly to Google Sheets
+      via <em>File → Import</em>, or share it with lenders and co-developers.
+    </p>
+    <div class="export-options">
+      <div class="export-card">
+        <div class="export-icon">📗</div>
+        <h4>Excel Workbook (.xlsx)</h4>
+        <p>Full checklist with project details, all phases, status, weeks-to-complete, and notes — formatted and ready to share.</p>
+        <button class="btn btn-green" onclick="exportXLSX()">⬇ Download Excel</button>
+      </div>
+      <div class="export-card">
+        <div class="export-icon">📄</div>
+        <h4>CSV (for Google Sheets)</h4>
+        <p>Plain CSV of the checklist data. Open Google Sheets, use <em>File → Import → Upload</em> to load it instantly.</p>
+        <button class="btn btn-nav btn-nav-next" onclick="exportCSV()">⬇ Download CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon">☁️</div> Google Sheets — How to Import</div>
+    <ol style="font-size:13px;color:var(--gray-600);line-height:2;padding-left:18px;">
+      <li>Download the <strong>Excel (.xlsx)</strong> or <strong>CSV</strong> file above.</li>
+      <li>Open <a href="https://sheets.google.com" target="_blank" style="color:var(--blue);">sheets.google.com</a> and create a new spreadsheet.</li>
+      <li>Go to <strong>File → Import → Upload</strong> and select the downloaded file.</li>
+      <li>Choose <em>"Replace spreadsheet"</em> or <em>"Insert new sheet(s)"</em> and click <strong>Import data</strong>.</li>
+      <li>All project details, phases, status values, and notes will be preserved.</li>
+    </ol>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title"><div class="icon">🏠</div> Return to Home</div>
+    <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;">Assessment complete. Return to the Finance Assessment Navigator to start a new assessment or exit the tool.</p>
+    <button class="btn btn-outline" onclick="window.location.href='Assessment_Intro.html'" style="font-size:13px;">← Return to Home</button>
+  </div>
+
+  <div class="page-nav">
+    <button class="btn-nav btn-nav-back" onclick="goTo(3)">← Summary</button>
+    <div></div>
+  </div>
+
+</div>
+</div><!-- /page-4 -->
+
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════ SCRIPT ═══════════════════ -->
+<script>
+// ─────────────────────────────────────────────────────────────
+// DATA MODEL
+// ─────────────────────────────────────────────────────────────
+const PHASES = [
+  {
+    id: 'p1', label: 'Phase 1: Site Identification / Concept',
+    groups: [
+      { heading: null, items: [
+        { id:'p1_1', desc:'Site location identified and secured', tags:['eng'] },
+        { id:'p1_2', desc:'Project development funding secured', tags:[] },
+      ]}
+    ]
+  },
+  {
+    id: 'p2', label: 'Phase 2: Pre-Feasibility Stage',
+    groups: [
+      { heading: null, items: [
+        { id:'p2_1', desc:'Different technical options assessed for suitability (controller type, storage, backup generator, etc.)', tags:['eng'] },
+        { id:'p2_2', desc:'Cost/benefit analysis of each technical option completed', tags:['eng'] },
+        { id:'p2_3', desc:'Identification of all permitting needs and pre-conditions to issuance', tags:['legal'] },
+        { id:'p2_4', desc:'Suitable off-taker for power found and basic agreement reached', tags:['legal','fin'] },
+        { id:'p2_5', desc:'Detailed site insolation data collection started and site layout planning done', tags:['eng'] },
+      ]}
+    ]
+  },
+  {
+    id: 'p3', label: 'Phase 3: Feasibility Stage',
+    groups: [
+      { heading: null, items: [
+        { id:'p3_1', desc:'Funding for feasibility stage is in place', tags:[] },
+        { id:'p3_2', desc:'Technical and financial evaluation of preferred option completed', tags:['eng'] },
+        { id:'p3_3', desc:'Assessment of financing options and needs is at 80% accuracy', tags:['fin'] },
+        { id:'p3_4', desc:'Permitting process fully planned and initiated: Land, EIA, production, transmission, distribution', tags:['legal'] },
+        { id:'p3_5', desc:'Potential returns for stakeholder groups established at 80% accuracy', tags:['fin'] },
+        { id:'p3_6', desc:'Source of development funding identified', tags:['fin'] },
+        { id:'p3_7', desc:'Local SPV registered.', tags:['legal'] },
+      ]}
+    ]
+  },
+  {
+    id: 'p4', label: 'Phase 4: Development Stage',
+    groups: [
+      { heading: 'Contracting Strategy', items: [
+        { id:'p4_c1', desc:'Pre-selection of project finance lawyers and quote', tags:['legal'] },
+        { id:'p4_c2', desc:'Pre-selection of EPC contractor(s)', tags:['eng'] },
+        { id:'p4_c3', desc:'Pre-selection of O&M contractor(s)', tags:['eng'] },
+        { id:'p4_c4', desc:'Conditional land lease, purchase and expropriation contracts signed', tags:['legal'] },
+        { id:'p4_c5', desc:'Detailed site insolation data and layout collected and finalised', tags:['eng'] },
+        { id:'p4_c6', desc:'Site access, access road arrangements, access to transmission/distribution lines clarified', tags:['eng'] },
+        { id:'p4_c7', desc:'Off-take term sheet (PPA) negotiated', tags:['fin'] },
+        { id:'p4_c8', desc:'Inter-connection agreement and wheeling charges negotiated', tags:['legal'] },
+        { id:'p4_c9', desc:'RFP for EPC contract sent to potential candidates', tags:['eng'] },
+        { id:'p4_c10', desc:'RFP for O&M contract sent to potential candidates', tags:['eng'] },
+      ]},
+      { heading: 'Equity Funding Strategy', items: [
+        { id:'p4_e1', desc:'Selection of potential equity providers completed', tags:[] },
+        { id:'p4_e2', desc:'Equity provider information memorandum completed', tags:[] },
+        { id:'p4_e3', desc:'Returns and cash flow waterfall structure modelled', tags:['fin'] },
+        { id:'p4_e4', desc:'Shareholders agreement drafted', tags:['legal'] },
+        { id:'p4_e5', desc:'Financial instruments worked out (preference shares / shareholder loans / ordinary equity)', tags:['fin'] },
+      ]},
+      { heading: 'Debt Funding Strategy', items: [
+        { id:'p4_d1', desc:'Selection of potential debt providers completed', tags:['fin'] },
+        { id:'p4_d2', desc:'Established required loan tenor, interest rate, debt structure (mezzanine, senior, working capital)', tags:['fin'] },
+        { id:'p4_d3', desc:'Debt provider information memorandum completed', tags:['fin'] },
+      ]},
+      { heading: 'Grant Strategy', items: [
+        { id:'p4_g1', desc:'Availability of grant support established and quantified', tags:[] },
+        { id:'p4_g2', desc:'Conditional grant agreements signed', tags:['legal'] },
+      ]},
+      { heading: 'Detailed Design & Costing', items: [
+        { id:'p4_dd1', desc:'Technical drawings completed', tags:['eng'] },
+        { id:'p4_dd2', desc:'Construction duration and phasing determined', tags:['eng'] },
+        { id:'p4_dd3', desc:'Construction costs at 95% certainty', tags:['eng'] },
+        { id:'p4_dd4', desc:'Local & imported components identified', tags:['eng'] },
+        { id:'p4_dd5', desc:'Disbursement schedule agreed', tags:['fin'] },
+      ]},
+      { heading: 'Financial Model — First Iteration', items: [
+        { id:'p4_fm1', desc:'Key assumptions detailed', tags:[] },
+        { id:'p4_fm2', desc:'Debt ratios (DSCR, IDC, fees) calculated', tags:['fin'] },
+        { id:'p4_fm3', desc:'Hard currency & local currency costs established (hedging)', tags:['fin'] },
+        { id:'p4_fm4', desc:'Project IRR, Equity IRR, NPV, Leverage ratio defined', tags:['fin'] },
+        { id:'p4_fm5', desc:'Scenarios modelled (tariff drop, generation shortfall, cost overrun, etc.)', tags:[] },
+      ]},
+    ]
+  },
+  {
+    id: 'p5', label: 'Phase 5: Bankability Phase',
+    groups: [
+      { heading: null, items: [
+        { id:'p5_1', desc:'All permits and licenses (possible at this stage) received', tags:['legal'] },
+        { id:'p5_2', desc:'Debt term sheet(s) obtained', tags:['legal'] },
+        { id:'p5_3', desc:'Equity term sheet(s) agreed', tags:['legal'] },
+        { id:'p5_4', desc:'Suppliers selected and contract parameters established (performance guarantees, turnkey, DLDs)', tags:['legal'] },
+        { id:'p5_5', desc:'Financial modelling to establish total project costs, debt:equity ratio, size of debt established', tags:['fin'] },
+        { id:'p5_6', desc:'Signing of supply, lease/purchase/expropriation contracts to secure land (timing in line with commissioning schedule)', tags:['legal'] },
+        { id:'p5_7', desc:'Electricity off-take contracts (PPA, others) signed', tags:['legal'] },
+        { id:'p5_8', desc:'Structuring of equity contribution agreements (ECA), direct agreements, bank agreements', tags:['fin'] },
+        { id:'p5_9', desc:'Signing of conditional loan agreements', tags:['fin'] },
+        { id:'p5_10', desc:'Removing conditionality from loan agreements — Financial Close', tags:[] },
+      ]}
+    ]
+  },
+  {
+    id: 'p6', label: 'Phase 6: Construction',
+    milestone: true
+  },
+  {
+    id: 'p7', label: 'Phase 7: Commissioning',
+    milestone: true
+  },
+];
+
+// In-memory state: status, weeks, note per item
+const state = {};
+PHASES.forEach(ph => {
+  if (ph.milestone) return;
+  ph.groups.forEach(g => g.items.forEach(it => {
+    state[it.id] = { status: 0, weeks: 0, note: '', amount: '' };
+  }));
+});
+
+// ─────────────────────────────────────────────────────────────
+// RENDER CHECKLIST
+// ─────────────────────────────────────────────────────────────
+function renderChecklist() {
+  const container = document.getElementById('phases-container');
+  container.innerHTML = '';
+
+  PHASES.forEach(ph => {
+    const block = document.createElement('div');
+    block.className = 'phase-block';
+    block.id = 'phase-block-' + ph.id;
+
+    if (ph.milestone) {
+      block.innerHTML = `
+        <div class="phase-header" style="cursor:default;">
+          <h3><span style="opacity:.6;">🏁</span> ${ph.label}</h3>
+          <span class="phase-badge">Milestone</span>
+        </div>
+        <div class="milestone-row">This phase begins after financial close. No pre-conditions to track here.</div>
+      `;
+      container.appendChild(block);
+      return;
+    }
+
+    // Count items
+    const allItems = ph.groups.flatMap(g => g.items);
+    const doneCount = allItems.filter(it => state[it.id].status === 4).length;
+    const pct = allItems.length ? Math.round(doneCount / allItems.length * 100) : 0;
+
+    block.innerHTML = `
+      <div class="phase-header" onclick="togglePhase('${ph.id}')">
+        <h3>${ph.label}</h3>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="phase-progress-text">${doneCount}/${allItems.length} complete (${pct}%)</span>
+          <span class="phase-badge">▾</span>
+        </div>
+      </div>
+      <div class="phase-body">
+        <div class="checklist-header">
+          <span>Checklist Item</span>
+          <span>Status</span>
+          <span style="text-align:center;">Wks to Complete</span>
+          <span style="text-align:center;">Done</span>
+          <span>Notes</span>
+        </div>
+        ${ph.groups.map(g => `
+          ${g.heading ? `<div class="subgroup-heading">${g.heading}</div>` : ''}
+          ${g.items.map(it => renderItem(it)).join('')}
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(block);
+  });
+}
+
+function renderItem(it) {
+  const s = state[it.id];
+  const tagHtml = it.tags.map(t =>
+    `<span class="tag tag-${t}">${t === 'legal' ? 'Legal' : t === 'fin' ? 'Fin.' : 'Eng.'}</span>`
+  ).join('');
+
+  const notesCell = `<textarea class="note-input" id="note-${it.id}" placeholder="Add a note…"
+      oninput="updateNote('${it.id}', this.value)">${s.note}</textarea>`;
+
+  return `
+    <div class="checklist-row" id="row-${it.id}">
+      <div class="item-desc">
+        ${it.desc}
+        ${tagHtml ? `<div class="item-tags">${tagHtml}</div>` : ''}
+      </div>
+      <select class="status-select s${s.status}" id="sel-${it.id}" onchange="updateStatus('${it.id}', this.value)">
+        <option value="0" ${s.status==0?'selected':''}>0 — Not started</option>
+        <option value="1" ${s.status==1?'selected':''}>1 — Started</option>
+        <option value="2" ${s.status==2?'selected':''}>2 — Headway</option>
+        <option value="3" ${s.status==3?'selected':''}>3 — Almost done</option>
+        <option value="4" ${s.status==4?'selected':''}>4 — Completed</option>
+      </select>
+      <input type="number" class="weeks-input" id="wk-${it.id}" value="${s.weeks}" min="0"
+        oninput="updateWeeks('${it.id}', this.value)" placeholder="0">
+      <div class="completion-wrap">
+        <input type="checkbox" id="chk-${it.id}" ${s.status==4?'checked':''} onchange="toggleDone('${it.id}', this.checked)">
+        <label for="chk-${it.id}" style="font-size:11px;color:var(--gray-600);">Done</label>
+      </div>
+      ${notesCell}
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────────────────────
+// STATE UPDATES
+// ─────────────────────────────────────────────────────────────
+function updateStatus(id, val) {
+  state[id].status = parseInt(val);
+  const sel = document.getElementById('sel-' + id);
+  sel.className = 'status-select s' + val;
+  const chk = document.getElementById('chk-' + id);
+  if (chk) chk.checked = (parseInt(val) === 4);
+}
+
+function toggleDone(id, checked) {
+  const val = checked ? 4 : (state[id].status === 4 ? 0 : state[id].status);
+  state[id].status = val;
+  const sel = document.getElementById('sel-' + id);
+  sel.value = val;
+  sel.className = 'status-select s' + val;
+}
+
+function updateWeeks(id, val) {
+  state[id].weeks = parseInt(val) || 0;
+}
+
+function updateNote(id, val) {
+  state[id].note = val;
+}
+
+function updateAmount(id, val) {
+  state[id].amount = val;
+}
+
+function syncEquity(debtVal) {
+  const debt = parseFloat(debtVal);
+  const eq = document.getElementById('f-equity-pct');
+  if (!isNaN(debt) && debt >= 0 && debt <= 100) {
+    eq.value = (100 - debt).toFixed(1).replace('.0','');
+  } else {
+    eq.value = '';
+  }
+}
+
+function togglePhase(id) {
+  const block = document.getElementById('phase-block-' + id);
+  block.classList.toggle('collapsed');
+}
+
+// ─────────────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────────────
+let currentPage = 1;
+
+function goTo(n) {
+  document.getElementById('page-' + currentPage).classList.remove('active');
+  document.getElementById('tab-' + currentPage).classList.remove('active');
+  document.getElementById('tab-' + currentPage).classList.add('done');
+
+  currentPage = n;
+  document.getElementById('page-' + currentPage).classList.add('active');
+  document.getElementById('tab-' + currentPage).classList.add('active');
+  document.getElementById('tab-' + currentPage).classList.remove('done');
+
+  if (n === 3) renderSummary();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ─────────────────────────────────────────────────────────────
+// SUMMARY
+// ─────────────────────────────────────────────────────────────
+function renderSummary() {
+  const allItems = PHASES.filter(p => !p.milestone).flatMap(p => p.groups.flatMap(g => g.items));
+  const total = allItems.length;
+  const done  = allItems.filter(it => state[it.id].status === 4).length;
+  const started = allItems.filter(it => state[it.id].status > 0 && state[it.id].status < 4).length;
+  const notStarted = allItems.filter(it => state[it.id].status === 0).length;
+  const pct = Math.round(done / total * 100);
+
+  document.getElementById('summary-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Total Items</div></div>
+    <div class="stat-card green"><div class="stat-num">${done}</div><div class="stat-label">Completed</div></div>
+    <div class="stat-card amber"><div class="stat-num">${started}</div><div class="stat-label">In Progress</div></div>
+    <div class="stat-card"><div class="stat-num">${notStarted}</div><div class="stat-label">Not Started</div></div>
+  `;
+
+  const phaseRows = PHASES.map(ph => {
+    if (ph.milestone) {
+      return `
+        <div class="phase-summary-row">
+          <div class="phase-label" style="color:var(--gray-400);font-style:italic;">🏁 ${ph.label}</div>
+          <div class="mini-progress"><div class="mini-progress-fill" style="width:0%;background:var(--gray-400)"></div></div>
+          <div class="mini-pct" style="color:var(--gray-400);font-size:10px;">Post-FC</div>
+        </div>
+      `;
+    }
+    const items = ph.groups.flatMap(g => g.items);
+    const d = items.filter(it => state[it.id].status === 4).length;
+    const pct = items.length ? Math.round(d / items.length * 100) : 0;
+    const barColor = pct === 100 ? 'var(--green)' : pct > 0 ? 'var(--blue)' : 'var(--gray-400)';
+    return `
+      <div class="phase-summary-row">
+        <div class="phase-label">${ph.label}</div>
+        <div class="mini-progress"><div class="mini-progress-fill" style="width:${pct}%;background:${barColor}"></div></div>
+        <div class="mini-pct">${pct}%</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('phase-summary-rows').innerHTML = phaseRows;
+
+  const ns = allItems.filter(it => state[it.id].status === 0);
+  if (ns.length === 0) {
+    document.getElementById('not-started-list').innerHTML = '<em style="color:var(--green);">All items have been started or completed. ✓</em>';
+  } else {
+    document.getElementById('not-started-list').innerHTML = ns.map(it => `• ${it.desc}`).join('<br>');
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// EXPORT — EXCEL
+// ─────────────────────────────────────────────────────────────
+function getProjectDetails() {
+  const debtPct  = document.getElementById('f-debt-pct').value;
+  const equityPct = document.getElementById('f-equity-pct').value;
+  const debtEquityStr = (debtPct && equityPct) ? `${debtPct}% Debt : ${equityPct}% Equity` : (debtPct ? `${debtPct}% Debt` : '');
+  return {
+    'Company Name':                   document.getElementById('f-company').value,
+    'Project Name':                   document.getElementById('f-project').value,
+    'Developer / Sponsor':            document.getElementById('f-developer').value,
+    'Prepared By':                    document.getElementById('f-preparedby').value,
+    'Date':                           document.getElementById('f-date').value,
+    'Report Version':                 document.getElementById('f-version').value,
+    'Country':                        document.getElementById('f-country').value,
+    'Region / Province':              document.getElementById('f-region').value,
+    'GPS Coordinates':                document.getElementById('f-gps').value,
+    'Site Area (ha)':                 document.getElementById('f-area').value,
+    'Site Description':               document.getElementById('f-sitedesc').value,
+    'Distance to Grid & Connection Type': document.getElementById('f-griddistance').value,
+    'Technology Type':                document.getElementById('f-technology').value,
+    'Grid Connection':                document.getElementById('f-grid').value,
+    'Installed Capacity (MWp)':       document.getElementById('f-capacity').value,
+    'Storage Capacity (MWh)':         document.getElementById('f-storage').value,
+    'Annual Generation (GWh/yr)':     document.getElementById('f-generation').value,
+    'Expected COD':                   document.getElementById('f-cod').value,
+    'Off-Taker(s)':                   document.getElementById('f-offtaker').value,
+    'Tariff / PPA Structure':         document.getElementById('f-tariff').value,
+    'Estimated CAPEX (USD m)':                 document.getElementById('f-capex').value,
+    'Development Funding Required (USD m)':    document.getElementById('f-devfunding').value,
+    'Debt (%)':                                debtPct,
+    'Equity (%)':                              equityPct,
+    'Debt:Equity Ratio':                       debtEquityStr,
+    'Target Debt Tenor (yrs)':        document.getElementById('f-tenor').value,
+    'Currency':                       document.getElementById('f-currency').value,
+    'Financing Notes':                document.getElementById('f-financingnotes').value,
+  };
+}
+
+const STATUS_LABELS = ['Not started', 'Process started', 'Made some headway', 'Almost done', 'Completed'];
+
+async function exportXLSX() {
+  if (typeof ExcelJS === 'undefined') {
+    showToast('ExcelJS not loaded — check your internet connection.');
+    return;
+  }
+
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Minigrid Checklist App';
+  wb.created = new Date();
+
+  // ── Palette (full 8-char ARGB) ─────────────────────────────
+  const BLUE_DK  = 'FF0D4F7C';
+  const BLUE_MD  = 'FF1A6FA8';
+  const BLUE_LT  = 'FFD0E8F5';
+  const BLUE_XLT = 'FFE8F3FA';
+  const WHITE    = 'FFFFFFFF';
+  const S_BG = ['FFE5E7EB','FFFEF3C7','FFDBEAFE','FFF5F3FF','FFD1FAE5'];
+  const S_FG = ['FF6B7280','FF92400E','FF1E40AF','FF5B21B6','FF065F46'];
+
+  function bd(argb='FFD1D5DB') {
+    const s = {style:'thin', color:{argb}};
+    return {top:s, bottom:s, left:s, right:s};
+  }
+
+  function sty(cell, opts) {
+    const {bg=WHITE, fg='FF1F2937', bold=false, size=10, italic=false,
+           halign='left', valign='middle', wrap=true, indent=0, bdc='FFD1D5DB'} = opts;
+    cell.fill      = {type:'pattern', pattern:'solid', fgColor:{argb:bg}};
+    cell.font      = {bold, italic, size, color:{argb:fg}, name:'Calibri'};
+    cell.alignment = {horizontal:halign, vertical:valign, wrapText:wrap, indent};
+    cell.border    = bd(bdc);
+  }
+
+  // ── SHEET 1: Project Details ────────────────────────────────
+  const ws1 = wb.addWorksheet('Project Details', {views:[{state:'frozen',ySplit:4}]});
+  ws1.columns = [{width:40},{width:62}];
+
+  // Title
+  ws1.mergeCells('A1:B1');
+  sty(ws1.getCell('A1'), {bg:BLUE_DK, fg:WHITE, bold:true, size:13, halign:'center', bdc:BLUE_DK});
+  ws1.getCell('A1').value = 'MINIGRID PROJECT STATUS CHECKLIST — DEVELOPMENT READINESS ASSESSMENT';
+  ws1.getRow(1).height = 34;
+
+  // Sub-title
+  const det = getProjectDetails();
+  ws1.mergeCells('A2:B2');
+  sty(ws1.getCell('A2'), {bg:BLUE_MD, fg:WHITE, size:10, italic:true, halign:'center', bdc:BLUE_MD});
+  ws1.getCell('A2').value =
+    `${det['Company Name']||'—'}   ·   ${det['Project Name']||'—'}   ·   ${det['Date']||'—'}`;
+  ws1.getRow(2).height = 20;
+
+  // Thin colour stripe
+  ws1.mergeCells('A3:B3');
+  ws1.getCell('A3').fill = {type:'pattern', pattern:'solid', fgColor:{argb:BLUE_LT}};
+  ws1.getRow(3).height = 6;
+
+  // Column headers
+  ['A4','B4'].forEach((addr, i) => {
+    sty(ws1.getCell(addr), {bg:BLUE_DK, fg:WHITE, bold:true, size:10, indent:1, bdc:BLUE_DK});
+    ws1.getCell(addr).value = i === 0 ? 'FIELD' : 'VALUE';
+  });
+  ws1.getRow(4).height = 22;
+
+  // Data rows
+  Object.entries(det).forEach(([field, value], idx) => {
+    const rn = idx + 5;
+    const bg = idx % 2 === 0 ? WHITE : BLUE_XLT;
+    sty(ws1.getCell(`A${rn}`), {bg, bold:true,  size:10, indent:1});
+    sty(ws1.getCell(`B${rn}`), {bg, bold:false, size:10, indent:1});
+    ws1.getCell(`A${rn}`).value = field;
+    ws1.getCell(`B${rn}`).value = value || '';
+    ws1.getRow(rn).height = 18;
+  });
+
+  // ── SHEET 2: Checklist ──────────────────────────────────────
+  const ws2 = wb.addWorksheet('Checklist', {views:[{state:'frozen',ySplit:3}]});
+  ws2.columns = [
+    {width:30}, {width:26}, {width:56}, {width:20},
+    {width:10}, {width:18}, {width:16}, {width:8}, {width:44}
+  ];
+  const COLS = 'ABCDEFGHI';
+
+  // Title
+  ws2.mergeCells('A1:I1');
+  sty(ws2.getCell('A1'), {bg:BLUE_DK, fg:WHITE, bold:true, size:12, halign:'center', bdc:BLUE_DK});
+  ws2.getCell('A1').value = `MINIGRID DEVELOPMENT CHECKLIST — ${(det['Project Name']||'').toUpperCase()||'—'}`;
+  ws2.getRow(1).height = 30;
+
+  // Column headers
+  ['Phase','Sub-group','Checklist Item','Categories','Status #','Status','Wks to Complete','Done?','Notes']
+    .forEach((h, i) => {
+      sty(ws2.getCell(`${COLS[i]}2`), {bg:BLUE_MD, fg:WHITE, bold:true, size:9, halign:'center', bdc:BLUE_MD});
+      ws2.getCell(`${COLS[i]}2`).value = h;
+    });
+  ws2.getRow(2).height = 24;
+
+  let rn = 3;
+  PHASES.forEach(ph => {
+    // Phase title row
+    ws2.mergeCells(`A${rn}:I${rn}`);
+    const phBg = ph.milestone ? 'FF374151' : 'FF154E78';
+    sty(ws2.getCell(`A${rn}`), {bg:phBg, fg:WHITE, bold:true, size:10, indent:1, bdc:phBg});
+    ws2.getCell(`A${rn}`).value = ph.milestone
+      ? `🏁  ${ph.label}  (Milestone — commences post Financial Close)`
+      : ph.label;
+    ws2.getRow(rn).height = 20;
+    rn++;
+
+    if (ph.milestone) return;
+
+    ph.groups.forEach(g => {
+      if (g.heading) {
+        ws2.mergeCells(`A${rn}:I${rn}`);
+        sty(ws2.getCell(`A${rn}`), {bg:BLUE_LT, fg:BLUE_DK, bold:true, size:9, indent:2, bdc:'FFB0C4DE'});
+        ws2.getCell(`A${rn}`).value = g.heading.toUpperCase();
+        ws2.getRow(rn).height = 16;
+        rn++;
+      }
+
+      g.items.forEach((it, iIdx) => {
+        const s   = state[it.id];
+        const alt = iIdx % 2 === 0 ? WHITE : BLUE_XLT;
+        const cats = it.tags.map(t => t==='legal'?'Legal':t==='fin'?'Financial':'Engineering').join(', ');
+        const vals = ['', '', it.desc, cats, s.status, STATUS_LABELS[s.status],
+                      s.weeks||'', s.status===4?'Yes':'No', s.note||''];
+
+        vals.forEach((v, ci) => {
+          const cell = ws2.getCell(`${COLS[ci]}${rn}`);
+          const isStat = ci === 4;
+          const isCtr  = ci === 4 || ci === 6 || ci === 7;
+          sty(cell, {
+            bg:    isStat ? S_BG[s.status] : alt,
+            fg:    isStat ? S_FG[s.status] : 'FF1F2937',
+            bold:  isStat,
+            size:  10,
+            halign: isCtr ? 'center' : 'left',
+            indent: (ci===2||ci===8) ? 1 : 0,
+            wrap:  true
+          });
+          cell.value = v;
+        });
+        ws2.getRow(rn).height = (s.note||'').length > 80 ? 36 : 18;
+        rn++;
+      });
+    });
+  });
+
+  // ── SHEET 3: Legend ─────────────────────────────────────────
+  const ws3 = wb.addWorksheet('Legend');
+  ws3.columns = [{width:22},{width:38}];
+  let ln = 1;
+
+  // Status title
+  ws3.mergeCells(`A${ln}:B${ln}`);
+  sty(ws3.getCell(`A${ln}`), {bg:BLUE_DK, fg:WHITE, bold:true, size:11, halign:'center', bdc:BLUE_DK});
+  ws3.getCell(`A${ln}`).value = 'STATUS CODES';
+  ws3.getRow(ln).height = 24; ln++;
+
+  // Status header
+  ['Status #','Meaning'].forEach((v, i) => {
+    sty(ws3.getCell(`${['A','B'][i]}${ln}`), {bg:BLUE_MD, fg:WHITE, bold:true, size:10, indent:1, bdc:BLUE_MD});
+    ws3.getCell(`${['A','B'][i]}${ln}`).value = v;
+  });
+  ws3.getRow(ln).height = 20; ln++;
+
+  [[0,'Not started'],[1,'Process started'],[2,'Made some headway'],[3,'Almost done'],[4,'Completed']]
+    .forEach(([num, lbl]) => {
+      sty(ws3.getCell(`A${ln}`), {bg:S_BG[num], fg:S_FG[num], bold:true, size:11, halign:'center'});
+      ws3.getCell(`A${ln}`).value = num;
+      sty(ws3.getCell(`B${ln}`), {bg:S_BG[num], fg:S_FG[num], size:10, indent:1});
+      ws3.getCell(`B${ln}`).value = lbl;
+      ws3.getRow(ln).height = 18; ln++;
+    });
+
+  ln++; // spacer
+
+  // Category title
+  ws3.mergeCells(`A${ln}:B${ln}`);
+  sty(ws3.getCell(`A${ln}`), {bg:BLUE_DK, fg:WHITE, bold:true, size:11, halign:'center', bdc:BLUE_DK});
+  ws3.getCell(`A${ln}`).value = 'ITEM CATEGORIES';
+  ws3.getRow(ln).height = 24; ln++;
+
+  ['Category','Description'].forEach((v, i) => {
+    sty(ws3.getCell(`${['A','B'][i]}${ln}`), {bg:BLUE_MD, fg:WHITE, bold:true, size:10, indent:1, bdc:BLUE_MD});
+    ws3.getCell(`${['A','B'][i]}${ln}`).value = v;
+  });
+  ws3.getRow(ln).height = 20; ln++;
+
+  [
+    ['Legal',       'Legal / regulatory item',      'FFFEF3C7','FF92400E'],
+    ['Financial',   'Financial / commercial item',  'FFD1FAE5','FF065F46'],
+    ['Engineering', 'Engineering / technical item', 'FFDBEAFE','FF1E40AF'],
+  ].forEach(([cat, desc, bg, fg]) => {
+    sty(ws3.getCell(`A${ln}`), {bg, fg, bold:true, size:10, indent:1});
+    ws3.getCell(`A${ln}`).value = cat;
+    sty(ws3.getCell(`B${ln}`), {bg, fg, size:10, indent:1});
+    ws3.getCell(`B${ln}`).value = desc;
+    ws3.getRow(ln).height = 18; ln++;
+  });
+
+  // ── Download ────────────────────────────────────────────────
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob   = new Blob([buffer], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url    = URL.createObjectURL(blob);
+  const a      = document.createElement('a');
+  a.href       = url;
+  const companyRaw = document.getElementById('f-company').value || 'Company';
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2,'0');
+  const mm = String(today.getMonth()+1).padStart(2,'0');
+  const yyyy = today.getFullYear();
+  const fname = companyRaw.replace(/\s+/g,'_') + `_assessment_${dd}.${mm}.${yyyy}.xlsx`;
+  a.download   = fname;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Excel file downloaded: ' + fname);
+}
+
+// ─────────────────────────────────────────────────────────────
+// EXPORT — CSV
+// ─────────────────────────────────────────────────────────────
+function exportCSV() {
+  const rows = [['Phase','Sub-group','Checklist Item','Categories','Status #','Status Label','Weeks to Complete','Done?','Notes']];
+  PHASES.forEach(ph => {
+    if (ph.milestone) { rows.push([ph.label,'','(Milestone — commences post Financial Close)','','','','','','']); return; }
+    ph.groups.forEach(g => {
+      g.items.forEach(it => {
+        const s = state[it.id];
+        const cats = it.tags.map(t => t === 'legal' ? 'Legal' : t === 'fin' ? 'Financial' : 'Engineering').join('; ');
+        rows.push([ph.label, g.heading||'', it.desc, cats, s.status, STATUS_LABELS[s.status], s.weeks||'', s.status===4?'Yes':'No', s.note||'']);
+      });
+    });
+  });
+  const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (document.getElementById('f-project').value || 'Minigrid_Checklist').replace(/\s+/g,'_') + '_Status.csv';
+  a.click();
+  showToast('CSV file downloaded.');
+}
+
+// ─────────────────────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = '✓ ' + msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Default date to today
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+  renderChecklist();
+});
+</script>
+</body>
+</html>

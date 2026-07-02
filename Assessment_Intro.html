@@ -189,7 +189,7 @@
   <h1 class="main-title">What are you assessing?</h1>
 
   <!-- Question -->
-  <p class="question">Is this a Project Finance transaction or a Corporate Finance deal? Select the appropriate assessment below to begin.</p>
+  <p class="question">Select the appropriate assessment type below to begin.</p>
 
   <!-- Cards -->
   <div class="cards">
@@ -232,8 +232,62 @@
           <line x1="28" y1="99" x2="82" y2="99" stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round"/>
         </svg>
       </div>
-      <h2 class="card-title">Project Finance</h2>
+      <h2 class="card-title">IPP — Project Finance</h2>
       <p class="card-desc">Large-scale infrastructure, energy and utility projects requiring structured, ring-fenced project-level financing and bankability assessment.</p>
+      <button class="start-btn">Begin Assessment &rarr;</button>
+    </div>
+
+    <!-- Minigrid Card -->
+    <div class="choice-card" onclick="goTo('Minigrid_Checklist_App.html')">
+      <div class="card-graphic">
+        <svg viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="55" cy="55" r="55" fill="#DBEAFE"/>
+          <!-- Sun -->
+          <circle cx="55" cy="22" r="10" fill="#FCD34D" opacity="0.9"/>
+          <line x1="55" y1="9"  x2="55" y2="5"  stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+          <line x1="55" y1="35" x2="55" y2="39" stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+          <line x1="42" y1="22" x2="38" y2="22" stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+          <line x1="68" y1="22" x2="72" y2="22" stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+          <line x1="46" y1="13" x2="43" y2="10" stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+          <line x1="64" y1="31" x2="67" y2="34" stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+          <!-- Solar panel left -->
+          <rect x="12" y="48" width="28" height="16" rx="2" fill="#1A6FA8"/>
+          <line x1="12" y1="56" x2="40" y2="56" stroke="#93C5FD" stroke-width="1"/>
+          <line x1="21" y1="48" x2="21" y2="64" stroke="#93C5FD" stroke-width="1"/>
+          <line x1="31" y1="48" x2="31" y2="64" stroke="#93C5FD" stroke-width="1"/>
+          <!-- Solar panel right -->
+          <rect x="70" y="48" width="28" height="16" rx="2" fill="#1A6FA8"/>
+          <line x1="70" y1="56" x2="98" y2="56" stroke="#93C5FD" stroke-width="1"/>
+          <line x1="79" y1="48" x2="79" y2="64" stroke="#93C5FD" stroke-width="1"/>
+          <line x1="89" y1="48" x2="89" y2="64" stroke="#93C5FD" stroke-width="1"/>
+          <!-- Battery / inverter box centre -->
+          <rect x="42" y="52" width="26" height="18" rx="3" fill="#0D4F7C"/>
+          <rect x="46" y="56" width="6"  height="10" rx="1" fill="#93C5FD" opacity="0.8"/>
+          <rect x="54" y="56" width="6"  height="10" rx="1" fill="#93C5FD" opacity="0.5"/>
+          <rect x="62" y="56" width="3"  height="10" rx="1" fill="#93C5FD" opacity="0.3"/>
+          <!-- Wires connecting panels to battery -->
+          <line x1="40" y1="56" x2="42" y2="61" stroke="#2581C4" stroke-width="1.8"/>
+          <line x1="70" y1="56" x2="68" y2="61" stroke="#2581C4" stroke-width="1.8"/>
+          <!-- Houses -->
+          <polygon points="22,90 14,82 30,82" fill="#0D4F7C"/>
+          <rect x="16" y="82" width="12" height="10" rx="1" fill="#2581C4"/>
+          <rect x="20" y="86" width="4" height="6" fill="white" opacity="0.7" rx="1"/>
+          <polygon points="55,87 47,80 63,80" fill="#0D4F7C"/>
+          <rect x="49" y="80" width="12" height="12" rx="1" fill="#2581C4"/>
+          <rect x="53" y="84" width="4" height="8" fill="white" opacity="0.7" rx="1"/>
+          <polygon points="88,90 80,82 96,82" fill="#0D4F7C"/>
+          <rect x="82" y="82" width="12" height="10" rx="1" fill="#2581C4"/>
+          <rect x="86" y="86" width="4" height="6" fill="white" opacity="0.7" rx="1"/>
+          <!-- Distribution wires -->
+          <line x1="28" y1="87" x2="49" y2="85" stroke="#2581C4" stroke-width="1.2" stroke-dasharray="3,2"/>
+          <line x1="61" y1="85" x2="82" y2="87" stroke="#2581C4" stroke-width="1.2" stroke-dasharray="3,2"/>
+          <line x1="55" y1="70" x2="55" y2="80" stroke="#2581C4" stroke-width="1.5"/>
+          <line x1="55" y1="75" x2="22" y2="87" stroke="#2581C4" stroke-width="1.2" stroke-dasharray="3,2"/>
+          <line x1="55" y1="75" x2="88" y2="87" stroke="#2581C4" stroke-width="1.2" stroke-dasharray="3,2"/>
+        </svg>
+      </div>
+      <h2 class="card-title">Minigrid (Project Finance)</h2>
+      <p class="card-desc">Off-grid and weak-grid minigrid projects serving rural or peri-urban communities, structured as ring-fenced project finance transactions.</p>
       <button class="start-btn">Begin Assessment &rarr;</button>
     </div>
 
