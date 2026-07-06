@@ -612,9 +612,10 @@
         <table id="concession-table" style="width:100%;border-collapse:collapse;font-size:13px;">
           <thead>
             <tr>
-              <th style="background:var(--blue-dk,#0D4F7C);color:#fff;padding:8px 10px;text-align:left;font-weight:600;border:1px solid #b0c4de;width:40%;">Concession Area</th>
-              <th style="background:var(--blue-dk,#0D4F7C);color:#fff;padding:8px 10px;text-align:center;font-weight:600;border:1px solid #b0c4de;width:30%;">Estimated Connections</th>
-              <th style="background:var(--blue-dk,#0D4F7C);color:#fff;padding:8px 10px;text-align:center;font-weight:600;border:1px solid #b0c4de;width:30%;">Already Connected</th>
+              <th style="background:var(--blue-dk,#0D4F7C);color:#fff;padding:8px 10px;text-align:center;font-weight:600;border:1px solid #b0c4de;width:6%;">#</th>
+              <th style="background:var(--blue-dk,#0D4F7C);color:#fff;padding:8px 10px;text-align:left;font-weight:600;border:1px solid #b0c4de;width:38%;">Concession Area</th>
+              <th style="background:var(--blue-dk,#0D4F7C);color:#fff;padding:8px 10px;text-align:center;font-weight:600;border:1px solid #b0c4de;width:28%;">Estimated Connections</th>
+              <th style="background:var(--blue-dk,#0D4F7C);color:#fff;padding:8px 10px;text-align:center;font-weight:600;border:1px solid #b0c4de;width:28%;">Already Connected</th>
             </tr>
           </thead>
           <tbody id="concession-tbody">
@@ -665,6 +666,10 @@
       <div class="form-group">
         <label>Annual Generation Estimate (GWh/yr)</label>
         <input type="number" id="f-generation" placeholder="e.g. 85">
+      </div>
+      <div class="form-group">
+        <label>Expected Construction Start Date</label>
+        <input type="text" id="f-construction-start" placeholder="e.g. Q1 2027">
       </div>
       <div class="form-group">
         <label>Expected COD (Commercial Operation)</label>
@@ -870,7 +875,7 @@
 // ─────────────────────────────────────────────────────────────
 const PHASES = [
   {
-    id: 'p1', label: 'Phase 1: Site Identification / Concept',
+    id: 'p1', label: 'Phase 1: Site Identification / Development Funding',
     groups: [
       { heading: null, items: [
         { id:'p1_1', desc:'Site locations identified and secured', tags:['eng'] },
@@ -911,7 +916,7 @@ const PHASES = [
         { id:'p4_c3', desc:'Pre-selection of O&M contractor(s)', tags:['eng'] },
         { id:'p4_c4', desc:'Conditional land lease, purchase and expropriation contracts signed', tags:['legal'] },
         { id:'p4_c5', desc:'Detailed site insolation data and layout collected and finalised', tags:['eng'] },
-        { id:'p4_c6', desc:'Site access, access road arrangements, access to transmission/distribution lines clarified', tags:['eng'] },
+        { id:'p4_c6', desc:'Site access and logistics for construction clarified', tags:['eng'] },
         { id:'p4_c7', desc:'Off-take term sheet (PPA) negotiated if applicable', tags:['fin'] },
         { id:'p4_c8', desc:'Clarified termination charges or continued operations in case of Grid arrival', tags:['legal'] },
         { id:'p4_c9', desc:'RFP for EPC contract sent to potential candidates', tags:['eng'] },
@@ -931,7 +936,8 @@ const PHASES = [
       ]},
       { heading: 'Grant Strategy', items: [
         { id:'p4_g1', desc:'Availability of grant support established and quantified', tags:[] },
-        { id:'p4_g2', desc:'Conditional grant agreements signed', tags:['legal'] },
+        { id:'p4_g2', desc:'Grant application submitted', tags:['legal'] },
+        { id:'p4_g3', desc:'Conditional grant agreements signed', tags:['legal'] },
       ]},
       { heading: 'Detailed Design & Costing', items: [
         { id:'p4_dd1', desc:'Technical drawings completed', tags:['eng'] },
@@ -959,7 +965,6 @@ const PHASES = [
         { id:'p5_4', desc:'Suppliers selected and contract parameters established (performance guarantees, turnkey, DLDs)', tags:['legal'] },
         { id:'p5_5', desc:'Financial modelling to establish total project costs, debt:equity ratio, size of debt established', tags:['fin'] },
         { id:'p5_6', desc:'Signing of supply, lease/purchase/expropriation contracts to secure land (timing in line with commissioning schedule)', tags:['legal'] },
-        { id:'p5_7', desc:'Electricity off-take contracts (PPA, others) signed', tags:['legal'] },
         { id:'p5_8', desc:'Structuring of equity contribution agreements (ECA), direct agreements, bank agreements', tags:['fin'] },
         { id:'p5_9', desc:'Signing of conditional loan agreements', tags:['fin'] },
         { id:'p5_10', desc:'Removing conditionality from loan agreements — Financial Close', tags:[] },
@@ -1226,6 +1231,7 @@ function getProjectDetails() {
     'Installed Capacity (MWp)':                 document.getElementById('f-capacity').value,
     'Storage Capacity (MWh)':                   document.getElementById('f-storage').value,
     'Annual Generation (GWh/yr)':               document.getElementById('f-generation').value,
+    'Expected Construction Start':              document.getElementById('f-construction-start').value,
     'Expected COD':                             document.getElementById('f-cod').value,
     'Agreed Tariff (USDc / kWh)':              document.getElementById('f-agreed-tariff').value,
     'CAPEX per Connection (USD)':               document.getElementById('f-capex').value,
@@ -1392,15 +1398,15 @@ async function exportXLSX() {
 
   // ── SHEET 3: Concession Areas ───────────────────────────────
   const ws3c = wb.addWorksheet('Concession Areas');
-  ws3c.columns = [{width:44},{width:26},{width:26}];
+  ws3c.columns = [{width:6},{width:44},{width:26},{width:26}];
 
-  ws3c.mergeCells('A1:C1');
+  ws3c.mergeCells('A1:D1');
   sty(ws3c.getCell('A1'), {bg:BLUE_DK, fg:WHITE, bold:true, size:12, halign:'center', bdc:BLUE_DK});
   ws3c.getCell('A1').value = 'CONCESSION AREAS';
   ws3c.getRow(1).height = 28;
 
-  ['Concession Area','Estimated Connections','Already Connected'].forEach((h, i) => {
-    const addr = `${['A','B','C'][i]}2`;
+  ['#','Concession Area','Estimated Connections','Already Connected'].forEach((h, i) => {
+    const addr = `${['A','B','C','D'][i]}2`;
     sty(ws3c.getCell(addr), {bg:BLUE_MD, fg:WHITE, bold:true, size:10, halign:'center', bdc:BLUE_MD});
     ws3c.getCell(addr).value = h;
   });
@@ -1409,12 +1415,14 @@ async function exportXLSX() {
   getConcessionRows().forEach((row, idx) => {
     const rn = idx + 3;
     const bg = idx % 2 === 0 ? WHITE : BLUE_XLT;
-    sty(ws3c.getCell(`A${rn}`), {bg, size:10, indent:1});
-    sty(ws3c.getCell(`B${rn}`), {bg, size:10, halign:'center'});
+    sty(ws3c.getCell(`A${rn}`), {bg, size:10, halign:'center', bold:true});
+    sty(ws3c.getCell(`B${rn}`), {bg, size:10, indent:1});
     sty(ws3c.getCell(`C${rn}`), {bg, size:10, halign:'center'});
-    ws3c.getCell(`A${rn}`).value = row.area      || '';
-    ws3c.getCell(`B${rn}`).value = row.estimated ? Number(row.estimated) : '';
-    ws3c.getCell(`C${rn}`).value = row.connected ? Number(row.connected) : '';
+    sty(ws3c.getCell(`D${rn}`), {bg, size:10, halign:'center'});
+    ws3c.getCell(`A${rn}`).value = row.num;
+    ws3c.getCell(`B${rn}`).value = row.area      || '';
+    ws3c.getCell(`C${rn}`).value = row.estimated ? Number(row.estimated) : '';
+    ws3c.getCell(`D${rn}`).value = row.connected ? Number(row.connected) : '';
     ws3c.getRow(rn).height = 18;
   });
 
@@ -1532,10 +1540,11 @@ function buildConcessionTable() {
   const tbody = document.getElementById('concession-tbody');
   if (!tbody) return;
   tbody.innerHTML = '';
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 15; i++) {
     const bg = i % 2 === 0 ? '#ffffff' : '#f0f7ff';
     tbody.innerHTML += `
       <tr style="background:${bg}">
+        <td style="border:1px solid #d1d5db;padding:4px 6px;text-align:center;font-weight:600;color:#4b5563;font-size:12px;">${i + 1}</td>
         <td style="border:1px solid #d1d5db;padding:4px 6px;">
           <input type="text" id="ca-name-${i}" placeholder="e.g. Village / District name"
             style="width:100%;border:none;background:transparent;font-size:13px;outline:none;color:#1f2937;">
@@ -1553,7 +1562,8 @@ function buildConcessionTable() {
 }
 
 function getConcessionRows() {
-  return Array.from({length: 10}, (_, i) => ({
+  return Array.from({length: 15}, (_, i) => ({
+    num:       i + 1,
     area:      (document.getElementById(`ca-name-${i}`)?.value  || '').trim(),
     estimated: (document.getElementById(`ca-est-${i}`)?.value   || '').trim(),
     connected: (document.getElementById(`ca-conn-${i}`)?.value  || '').trim(),
